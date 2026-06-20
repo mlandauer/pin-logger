@@ -1,7 +1,7 @@
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
 #![no_std]
-
+#![deny(clippy::pedantic)]
 #[cfg(feature = "build")]
 extern crate std;
 
@@ -45,6 +45,8 @@ pub fn init_internal<const N: usize, const M: usize>(
     });
 }
 
+/// # Panics
+/// init needs to be called first before doing anything else. Otherwise this will panic
 pub fn pin_log_internal(pin_state: usize, name: &str) {
     critical_section::with(|cs| {
         let mut borrow_mut = PIN_LOGGER.borrow(cs).borrow_mut();
@@ -110,6 +112,7 @@ impl PinLogger {
     }
 }
 
+#[must_use]
 pub const fn pin_state_for_name<const N: usize>(names: [&str; N], name: &str) -> Option<usize> {
     let mut i: usize = 0;
     while i < N {

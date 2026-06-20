@@ -21,6 +21,8 @@ struct PinLog {
     location: String, // "relative/path/to/file.rs:42"
 }
 
+/// # Panics
+/// If cargo metadata can't be accessed this will panic.
 pub fn scan_source_for_pin_logs(human_file_path: &Path) {
     let metadata = MetadataCommand::new()
         .no_deps()
@@ -49,10 +51,10 @@ fn extract_pin_log_names_in_directory(
     workspace_root: &Path,
     pin_logs: &mut Vec<PinLog>,
 ) {
-    for entry in walkdir::WalkDir::new(&src_dir)
+    for entry in walkdir::WalkDir::new(src_dir)
         .sort_by_file_name()
         .into_iter()
-        .filter_map(|e| e.ok())
+        .filter_map(Result::ok)
         .filter(|e| e.path().extension().is_some_and(|ext| ext == "rs"))
     {
         let relative_path = entry
@@ -88,6 +90,7 @@ fn pin_state(n: usize, width: usize) -> String {
 }
 
 fn pin_numbers(width: usize) -> String {
+    #[allow(clippy::cast_possible_truncation)]
     (0..width)
         .map(|i| char::from_digit((i % 10) as u32, 10).unwrap().to_string())
         .collect::<Vec<_>>()
