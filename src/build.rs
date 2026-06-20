@@ -1,4 +1,9 @@
+use alloc::format;
 use cargo_metadata::MetadataCommand;
+use std::println;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use std::{
     cmp::max,
     env::var,
@@ -16,7 +21,7 @@ struct PinLog {
     location: String, // "relative/path/to/file.rs:42"
 }
 
-pub(crate) fn scan_source_for_pin_logs(human_file_path: &Path) {
+pub fn scan_source_for_pin_logs(human_file_path: &Path) {
     let metadata = MetadataCommand::new()
         .no_deps()
         .exec()

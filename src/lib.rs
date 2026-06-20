@@ -1,12 +1,19 @@
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
 #![no_std]
+
+#[cfg(feature = "build")]
+extern crate std;
+
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::cell::RefCell;
 use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
 use log::info;
 extern crate alloc;
+
+#[cfg(feature = "build")]
+pub mod build;
 
 const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
