@@ -1,6 +1,6 @@
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
-
+#![no_std]
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::cell::RefCell;
 use critical_section::Mutex;
@@ -118,14 +118,14 @@ pub const fn pin_state_for_name<const N: usize>(names: [&str; N], name: &str) ->
 #[macro_export]
 macro_rules! pin_log {
     ($name:literal) => {{
-        const PIN_STATE: usize = pin_state_for_name(NAMES, $name).unwrap();
-        pin_log_internal(PIN_STATE, $name);
+        const PIN_STATE: usize = pin_logger::pin_state_for_name(NAMES, $name).unwrap();
+        pin_logger::pin_log_internal(PIN_STATE, $name);
     }};
 }
 
 #[macro_export]
 macro_rules! init {
     ($outputs:expr) => {{
-        init_internal(&NAMES, $outputs);
+        pin_logger::init_internal(&NAMES, $outputs);
     }};
 }
