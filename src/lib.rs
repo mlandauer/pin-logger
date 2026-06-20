@@ -80,7 +80,7 @@ impl PinLogger {
 
     fn pin_log(&mut self, pin_state: usize, name: &str) {
         let before = self.binary_string(self.pin_state);
-        self.pin_state = pin_state.try_into().expect("number is out of bounds");
+        self.pin_state = pin_state;
         let after = self.binary_string(self.pin_state);
         self.set_outputs(self.pin_state);
         info!("{before}->{after}: {name}");
