@@ -12,7 +12,7 @@ const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
-pub(crate) trait SetPin: Send {
+pub trait SetPin: Send {
     fn set_low(&mut self);
     fn set_high(&mut self);
 }
@@ -29,7 +29,7 @@ impl<P: OutputPin + Send> SetPin for P {
 
 static PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
 
-pub(crate) fn init_internal<const N: usize, const M: usize>(
+pub fn init_internal<const N: usize, const M: usize>(
     names: &[&str; M],
     outputs: [Box<dyn SetPin>; N],
 ) {
@@ -38,7 +38,7 @@ pub(crate) fn init_internal<const N: usize, const M: usize>(
     });
 }
 
-pub(crate) fn pin_log_internal(pin_state: usize, name: &str) {
+pub fn pin_log_internal(pin_state: usize, name: &str) {
     critical_section::with(|cs| {
         let mut borrow_mut = PIN_LOGGER.borrow(cs).borrow_mut();
         let pin_logger = borrow_mut
@@ -103,10 +103,7 @@ impl PinLogger {
     }
 }
 
-pub(crate) const fn pin_state_for_name<const N: usize>(
-    names: [&str; N],
-    name: &str,
-) -> Option<usize> {
+pub const fn pin_state_for_name<const N: usize>(names: [&str; N], name: &str) -> Option<usize> {
     let mut i: usize = 0;
     while i < N {
         if names[i] == name {
@@ -118,19 +115,17 @@ pub(crate) const fn pin_state_for_name<const N: usize>(
     None
 }
 
+#[macro_export]
 macro_rules! pin_log {
     ($name:literal) => {{
-        const PIN_STATE: usize = crate::pin_logger::pin_state_for_name(NAMES, $name).unwrap();
-        crate::pin_logger::pin_log_internal(PIN_STATE, $name);
+        const PIN_STATE: usize = pin_state_for_name(NAMES, $name).unwrap();
+        pin_log_internal(PIN_STATE, $name);
     }};
 }
 
+#[macro_export]
 macro_rules! init {
     ($outputs:expr) => {{
-        crate::pin_logger::init_internal(&NAMES, $outputs);
+        init_internal(&NAMES, $outputs);
     }};
 }
-
-// Magic for making this available outside but scoped to the module
-pub(crate) use init;
-pub(crate) use pin_log;
