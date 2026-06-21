@@ -2,9 +2,9 @@
 #![feature(const_cmp)]
 #![no_std]
 #![deny(clippy::pedantic)]
+extern crate alloc;
 #[cfg(feature = "build")]
 extern crate std;
-extern crate alloc;
 
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::cell::RefCell;
