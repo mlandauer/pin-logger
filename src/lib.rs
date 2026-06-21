@@ -128,6 +128,9 @@ pub const fn pin_state_for_name<const N: usize>(names: [&str; N], name: &str) ->
 #[macro_export]
 macro_rules! pin_log {
     ($name:literal) => {{
+        // TODO: Show a more helpful message if NAMES is not defined
+        // TODO: Rename NAMES to something a little more obscure / less likely to bump into an exisiting name
+        // TODO: Pass to a function that has the same parameters as the macro
         const PIN_STATE: usize = pin_logger::pin_state_for_name(NAMES, $name).unwrap();
         pin_logger::pin_log_internal(PIN_STATE, $name);
     }};
