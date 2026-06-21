@@ -11,9 +11,9 @@ use std::{
     path::Path,
 };
 use syn::{
-    Expr, Lit,
     punctuated::Punctuated,
-    visit::{Visit, visit_macro},
+    visit::{visit_macro, Visit},
+    Expr, Lit,
 };
 
 struct PinLog {
@@ -42,7 +42,9 @@ pub fn scan_source_for_pin_logs(human_file_path: &Path) {
     }
 
     let out_dir = var("OUT_DIR").unwrap();
+    // TODO: Rename files
     write_names_rust_file(&pin_logs, &Path::new(&out_dir).join("mark_names.rs"));
+    write_names_length_rust_file(&pin_logs, &Path::new(&out_dir).join("names_length.rs"));
     write_names_human_file(&pin_logs, human_file_path);
 }
 
@@ -75,8 +77,13 @@ fn write_names_rust_file(pin_logs: &[PinLog], path: &Path) {
         .iter()
         .map(|pl| format!("{:?},", pl.name))
         .collect();
+    let code = format!("[{entries}]");
+    write(path, code).unwrap();
+}
+
+fn write_names_length_rust_file(pin_logs: &[PinLog], path: &Path) {
     let length = pin_logs.len();
-    let code = format!("pub(crate) const NAMES: [&str; {length}] = [{entries}];");
+    let code = format!("{length}");
     write(path, code).unwrap();
 }
 
