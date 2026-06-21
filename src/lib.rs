@@ -95,7 +95,7 @@ macro_rules! load_names {
     ($name:ident, $length:ident) => {
         // TODO: Give a nice error message if included file doesn't exist (to add build script)
         const $length: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
-        const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/mark_names.rs"));
+        const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/names.rs"));
     };
 }
 
