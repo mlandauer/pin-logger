@@ -4,13 +4,13 @@
 #![deny(clippy::pedantic)]
 #[cfg(feature = "build")]
 extern crate std;
+extern crate alloc;
 
 use alloc::{boxed::Box, string::String, vec::Vec};
 use core::cell::RefCell;
 use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
 use log::info;
-extern crate alloc;
 
 #[cfg(feature = "build")]
 pub mod build;
