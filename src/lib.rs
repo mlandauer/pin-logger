@@ -87,16 +87,23 @@ impl PinLogger {
     }
 }
 
+// TODO: Hide documentation
 pub mod internal;
+
+#[macro_export]
+macro_rules! load_names {
+    ($name:ident, $length:ident) => {
+        // TODO: Give a nice error message if included file doesn't exist (to add build script)
+        const $length: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
+        const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/mark_names.rs"));
+    };
+}
 
 #[macro_export]
 macro_rules! pin_log {
     ($name:literal) => {{
-        // TODO: Give a nice error message if included file doesn't exist (to add build script)
-        const NAMES_LENGTH: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
-        const NAMES: [&str; NAMES_LENGTH] = include!(concat!(env!("OUT_DIR"), "/mark_names.rs"));
+        pin_logger::load_names!(NAMES, NAMES_LENGTH);
         const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name).unwrap();
-        // TODO: Move internal function to a module which has hidden documentation
         pin_logger::internal::pin_log(PIN_STATE, $name);
     }};
 }
@@ -104,8 +111,7 @@ macro_rules! pin_log {
 #[macro_export]
 macro_rules! init {
     ($outputs:expr) => {{
-        const NAMES_LENGTH: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
-        const NAMES: [&str; NAMES_LENGTH] = include!(concat!(env!("OUT_DIR"), "/mark_names.rs"));
+        pin_logger::load_names!(NAMES, NAMES_LENGTH);
         pin_logger::internal::init(&NAMES, $outputs);
     }};
 }
