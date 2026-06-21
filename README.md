@@ -1,6 +1,8 @@
 # Pin Logger
 
-A rust no-std library for embedded logging, but with digital output pins to mark bits of code so you can see what's happening while your device is running but without needing a normal console for log output.
+A rust no-std embedded-hal compatible library for embedded logging, but with digital output pins to mark bits of code so you can see what's happening while your device is running but without needing a normal console for log output.
+
+Requires alloc
 
 ## Why would anyone need this?
 
@@ -38,3 +40,25 @@ pins     name                          location
 It will also show these in the console output as the device is running.
 
 Then, when you use your power profiler you can see when the pins change and see which section is worthy of attention. To figure out what it corresponds you read of the pin values and you can read off the corresponding message and which line of code it came from.
+
+## Setup
+
+In `Cargo.toml`
+
+```
+[dependencies]
+pin_logger = "0.1"
+
+[build-dependencies]
+pin_logger = "0.1"
+```
+
+In `build.rs` (create in the root of your project if you don't already have one)
+
+```
+fn main() {
+    pin_logger::build::scan_source_for_pin_logs(std::path::Path::new("pin_logs.txt"));
+}
+```
+
+Minimal example for ESP (will also work with anything that has embedded-hal output pins)
