@@ -41,7 +41,7 @@ It will also show these in the console output as the device is running.
 
 Then, when you use your power profiler you can see when the pins change and see which section is worthy of attention. To figure out what it corresponds you read of the pin values and you can read off the corresponding message and which line of code it came from.
 
-## Setup
+## Usage
 
 In `Cargo.toml`
 
@@ -57,8 +57,43 @@ In `build.rs` (create in the root of your project if you don't already have one)
 
 ```
 fn main() {
+    // On build put a file in the root directory that shows which output pins correspond to which log message
     pin_logger::build::scan_source_for_pin_logs(std::path::Path::new("pin_logs.txt"));
 }
 ```
 
-Minimal example for ESP (will also work with anything that has embedded-hal output pins)
+Minimal example for esp:
+```
+...
+#[main]
+fn main() -> ! {
+    esp_println::logger::init_logger_from_env();
+
+    esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 1024);
+
+    let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
+    let peripherals = esp_hal::init(config);
+
+    pin_logger::init!([
+        Box::new(Output::new(
+            peripherals.GPIO25,
+            Level::Low,
+            Default::default()
+        )),
+        Box::new(Output::new(
+            peripherals.GPIO32,
+            Level::Low,
+            Default::default()
+        ))
+    ]);
+    pin_log!("Start of main");
+
+    loop {
+        pin_log!("Start of loop");
+        info!("Hello world!");
+        let delay_start = Instant::now();
+        while delay_start.elapsed() < Duration::from_millis(500) {}
+        pin_log!("End of loop");
+    }
+}
+```
