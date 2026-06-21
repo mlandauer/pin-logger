@@ -7,8 +7,6 @@ extern crate alloc;
 extern crate std;
 
 use alloc::{boxed::Box, string::String, vec::Vec};
-use core::cell::RefCell;
-use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
 use log::info;
 
@@ -32,29 +30,6 @@ impl<P: OutputPin + Send> SetPin for P {
     fn set_high(&mut self) {
         let _ = OutputPin::set_high(self);
     }
-}
-
-static PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
-
-pub fn init_internal<const N: usize, const M: usize>(
-    names: &[&str; M],
-    outputs: [Box<dyn SetPin>; N],
-) {
-    critical_section::with(|cs| {
-        *PIN_LOGGER.borrow(cs).borrow_mut() = Some(PinLogger::new(names, outputs));
-    });
-}
-
-/// # Panics
-/// init needs to be called first before doing anything else. Otherwise this will panic
-pub fn pin_log_internal(pin_state: usize, name: &str) {
-    critical_section::with(|cs| {
-        let mut borrow_mut = PIN_LOGGER.borrow(cs).borrow_mut();
-        let pin_logger = borrow_mut
-            .as_mut()
-            .expect("call init before calling pin_log!");
-        pin_logger.pin_log(pin_state, name);
-    });
 }
 
 struct PinLogger {
@@ -112,28 +87,17 @@ impl PinLogger {
     }
 }
 
-#[must_use]
-pub const fn pin_state_for_name<const N: usize>(names: [&str; N], name: &str) -> Option<usize> {
-    let mut i: usize = 0;
-    while i < N {
-        if names[i] == name {
-            // The first item on the list should have a number of one
-            return Some(i + 1);
-        }
-        i += 1;
-    }
-    None
-}
+pub mod internal;
 
 #[macro_export]
 macro_rules! pin_log {
     ($name:literal) => {{
-        // TODO: Pass to a function that has the same parameters as the macro
+        // TODO: Give a nice error message if included file doesn't exist (to add build script)
         const NAMES_LENGTH: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
         const NAMES: [&str; NAMES_LENGTH] = include!(concat!(env!("OUT_DIR"), "/mark_names.rs"));
-        const PIN_STATE: usize = pin_logger::pin_state_for_name(NAMES, $name).unwrap();
+        const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name).unwrap();
         // TODO: Move internal function to a module which has hidden documentation
-        pin_logger::pin_log_internal(PIN_STATE, $name);
+        pin_logger::internal::pin_log(PIN_STATE, $name);
     }};
 }
 
@@ -142,6 +106,6 @@ macro_rules! init {
     ($outputs:expr) => {{
         const NAMES_LENGTH: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
         const NAMES: [&str; NAMES_LENGTH] = include!(concat!(env!("OUT_DIR"), "/mark_names.rs"));
-        pin_logger::init_internal(&NAMES, $outputs);
+        pin_logger::internal::init(&NAMES, $outputs);
     }};
 }
