@@ -74,10 +74,10 @@ fn main() -> ! {
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let p = esp_hal::init(config);
 
-    pin_logger::init!([
+    pin_logger::init!(
         Output::new(p.GPIO25, Level::Low, Default::default()),
         Output::new(p.GPIO32, Level::Low, Default::default()),
-    ]);
+    );
     pin_log!("Start of main");
 
     loop {

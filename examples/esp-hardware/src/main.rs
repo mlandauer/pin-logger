@@ -34,10 +34,10 @@ fn main() -> ! {
 
     esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 98768);
 
-    pin_logger::init!([
+    pin_logger::init!(
         Output::new(p.GPIO25, Level::Low, Default::default()),
         Output::new(p.GPIO32, Level::Low, Default::default())
-    ]);
+    );
     pin_log!("Start of main");
 
     loop {

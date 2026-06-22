@@ -122,20 +122,20 @@ macro_rules! pin_log {
 
 /// Initialise the logger
 ///
-/// Pass an array of hardware output pins. The pins should implement the `OutputPin` trait from embedded-hal.
+/// Pass a list of hardware output pins. The pins should implement the `OutputPin` trait from embedded-hal.
 /// The number of pins needed depends on the number of times `pin_log` is used.
 ///
 /// # Example (using esp-hal)
 /// ```
-/// pin_logger::init!([
+/// pin_logger::init!(
 ///    Output::new(p.GPIO25, Level::Low, Default::default()),
-///    Output::new(p.GPIO32, Level::Low, Default::default())
-/// ]);
+///    Output::new(p.GPIO32, Level::Low, Default::default()),
+/// );
 /// ```
 #[macro_export]
 macro_rules! init {
-    ($outputs:expr) => {{
+    ($($output:expr),* $(,)?) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
-        pin_logger::internal::init(&NAMES, $outputs);
+        pin_logger::internal::init(&NAMES, [$($output),*]);
     }};
 }
