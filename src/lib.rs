@@ -136,6 +136,7 @@ macro_rules! pin_log {
 macro_rules! init {
     ($($output:expr),* $(,)?) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
-        pin_logger::internal::init(&NAMES, [$($output),*]);
+        // Boxing here so that we don't actually need all the pins to have the same type
+        pin_logger::internal::init(&NAMES, [$(alloc::boxed::Box::new($output)),*]);
     }};
 }
