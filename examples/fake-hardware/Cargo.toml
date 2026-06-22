@@ -1,0 +1,8 @@
+[package]
+name = "fake-hardware"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+colog = "1.4.0"
+log = "0.4.33"
