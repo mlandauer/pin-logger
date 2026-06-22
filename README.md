@@ -5,8 +5,6 @@
 
 A rust no-std embedded-hal compatible library for embedded logging, but with digital output pins to mark bits of code so you can see what's happening while your device is running but without needing a normal console for log output.
 
-Requires alloc
-
 ## Why would anyone need this?
 
 Let's say your power profiling the device you're working on. It's got lots going on and you want to understand what sections of code you should focus your optimising efforts on.
@@ -71,8 +69,6 @@ Minimal example for esp:
 #[main]
 fn main() -> ! {
     esp_println::logger::init_logger_from_env();
-
-    esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 1024);
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let p = esp_hal::init(config);

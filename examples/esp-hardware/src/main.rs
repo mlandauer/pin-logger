@@ -15,8 +15,6 @@ use esp_hal::time::{Duration, Instant};
 use log::info;
 use pin_logger::pin_log;
 
-extern crate alloc;
-
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
@@ -31,8 +29,6 @@ fn main() -> ! {
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let p = esp_hal::init(config);
-
-    esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 98768);
 
     let mut l = pin_logger::init!(
         Output::new(p.GPIO25, Level::Low, Default::default()),

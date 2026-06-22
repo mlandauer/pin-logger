@@ -4,8 +4,6 @@
 use crate::fake_pin::FakePin;
 use pin_logger::pin_log;
 
-extern crate alloc;
-
 mod fake_pin;
 
 fn main() {
