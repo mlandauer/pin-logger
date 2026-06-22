@@ -45,6 +45,10 @@ impl OutputPin for FakePin {
 fn main() {
     colog::init();
 
-    pin_logger::init!([Box::new(FakePin::new(0))]);
-    pin_log!("Hello");
+    pin_logger::init!([Box::new(FakePin::new(0)), Box::new(FakePin::new(1))]);
+    pin_log!("Start");
+    // Do something here
+    pin_log!("Middle");
+    // Do something more here
+    pin_log!("End")
 }
