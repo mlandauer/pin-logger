@@ -1,6 +1,6 @@
 [package]
 name = "pin-logger"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 categories = ["embedded", "no-std", "development-tools::profiling", "development-tools::debugging"]
 keywords = ["power", "ppk2", "profiling", "logging"]
