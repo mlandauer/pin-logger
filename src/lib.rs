@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
 #![no_std]
