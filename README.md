@@ -1,5 +1,8 @@
 # Pin Logger
 
+[<img alt="crates.io" src="https://img.shields.io/crates/v/pin-logger.svg?style=for-the-badge&color=fc8d62" height="20">](https://crates.io/crates/pin-logger)
+[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-pin%20logger-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/pin-logger)
+
 A rust no-std embedded-hal compatible library for embedded logging, but with digital output pins to mark bits of code so you can see what's happening while your device is running but without needing a normal console for log output.
 
 Requires alloc
