@@ -2,6 +2,12 @@
 name = "pin-logger"
 version = "0.1.0"
 edition = "2024"
+categories = ["embedded", "no-std", "profiling", "debugging"]
+keywords = ["power", "ppk2", "profiling", "logging"]
+# Opting for the same licenses as embedded-hal
+license = "MIT OR Apache-2.0"
+description = "no-std embedded-hal logging, but with digital output pins"
+readme = "README.md"
 
 [features]
 build = ["dep:cargo_metadata", "dep:proc-macro2", "dep:syn", "dep:walkdir"]
