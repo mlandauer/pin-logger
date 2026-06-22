@@ -8,6 +8,7 @@ keywords = ["power", "ppk2", "profiling", "logging"]
 license = "MIT OR Apache-2.0"
 description = "no-std embedded-hal logging, but with digital output pins"
 readme = "README.md"
+repository = "https://github.com/mlandauer/pin-logger"
 
 [features]
 build = ["dep:cargo_metadata", "dep:proc-macro2", "dep:syn", "dep:walkdir"]
