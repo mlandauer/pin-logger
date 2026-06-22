@@ -2,7 +2,7 @@
 name = "pin-logger"
 version = "0.1.0"
 edition = "2024"
-categories = ["embedded", "no-std", "profiling", "debugging"]
+categories = ["embedded", "no-std", "development-tools::profiling", "development-tools::debugging"]
 keywords = ["power", "ppk2", "profiling", "logging"]
 # Opting for the same licenses as embedded-hal
 license = "MIT OR Apache-2.0"
