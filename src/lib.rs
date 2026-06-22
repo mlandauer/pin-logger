@@ -101,6 +101,15 @@ macro_rules! load_names {
     };
 }
 
+/// Log a message to the output pins
+///
+/// Before calling this you need to initialise the logger with `init`.
+///
+/// # Example
+/// ```
+/// pin_log!("Connecting to network");
+/// ```
+///
 #[macro_export]
 macro_rules! pin_log {
     ($name:literal) => {{
@@ -110,6 +119,18 @@ macro_rules! pin_log {
     }};
 }
 
+/// Initialise the logger
+///
+/// Pass an array of hardware output pins. The pins should implement the `OutputPin` trait from embedded-hal.
+/// The number of pins needed depends on the number of times `pin_log` is used.
+///
+/// # Example (using esp-hal)
+/// ```
+/// pin_logger::init!([
+///    Box::new(Output::new(p.GPIO25, Level::Low, Default::default())),
+///    Box::new(Output::new(p.GPIO32, Level::Low, Default::default()))
+/// ]);
+/// ```
 #[macro_export]
 macro_rules! init {
     ($outputs:expr) => {{
