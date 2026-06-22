@@ -1,10 +1,50 @@
-#!no_std]
 // Simple example that doesn't depend on any particular embedded hardware that shows
 // how you can use this library
 
-use log::info;
+use embedded_hal::digital::{Error, ErrorKind, ErrorType, OutputPin};
+use log::debug;
+use pin_logger::pin_log;
+
+struct FakePin {
+    number: u8,
+}
+
+impl FakePin {
+    fn new(number: u8) -> Self {
+        Self { number }
+    }
+}
+
+#[derive(Debug)]
+struct FakePinError;
+
+impl Error for FakePinError {
+    fn kind(&self) -> ErrorKind {
+        ErrorKind::Other
+    }
+}
+
+impl ErrorType for FakePin {
+    type Error = FakePinError;
+}
+
+type FakePinResult = Result<(), FakePinError>;
+
+impl OutputPin for FakePin {
+    fn set_low(&mut self) -> FakePinResult {
+        debug!("Setting pin {} low", self.number);
+        Ok(())
+    }
+
+    fn set_high(&mut self) -> FakePinResult {
+        debug!("Setting pin {} high", self.number);
+        Ok(())
+    }
+}
 
 fn main() {
     colog::init();
-    info!("Hello!");
+
+    pin_logger::init!([Box::new(FakePin::new(0))]);
+    pin_log!("Hello");
 }

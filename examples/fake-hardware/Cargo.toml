@@ -5,4 +5,10 @@ edition = "2024"
 
 [dependencies]
 colog = "1.4.0"
+critical-section = { version = "1.2.0", features = ["std"] }
+embedded-hal = "1.0.0"
 log = "0.4.33"
+pin-logger = { path = "../.." }
+
+[build-dependencies]
+pin-logger = { path = "../..", features = ["build"] }
