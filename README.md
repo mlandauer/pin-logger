@@ -72,19 +72,11 @@ fn main() -> ! {
     esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 1024);
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
-    let peripherals = esp_hal::init(config);
+    let p = esp_hal::init(config);
 
     pin_logger::init!([
-        Box::new(Output::new(
-            peripherals.GPIO25,
-            Level::Low,
-            Default::default()
-        )),
-        Box::new(Output::new(
-            peripherals.GPIO32,
-            Level::Low,
-            Default::default()
-        ))
+        Output::new(p.GPIO25, Level::Low, Default::default()),
+        Output::new(p.GPIO32, Level::Low, Default::default()),
     ]);
     pin_log!("Start of main");
 

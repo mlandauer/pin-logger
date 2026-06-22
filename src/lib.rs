@@ -128,8 +128,8 @@ macro_rules! pin_log {
 /// # Example (using esp-hal)
 /// ```
 /// pin_logger::init!([
-///    Box::new(Output::new(p.GPIO25, Level::Low, Default::default())),
-///    Box::new(Output::new(p.GPIO32, Level::Low, Default::default()))
+///    Output::new(p.GPIO25, Level::Low, Default::default()),
+///    Output::new(p.GPIO32, Level::Low, Default::default())
 /// ]);
 /// ```
 #[macro_export]

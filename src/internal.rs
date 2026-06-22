@@ -5,10 +5,13 @@ use critical_section::Mutex;
 
 static PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
 
-// TODO: Would be nice to have a simpler interface that didn't depend on Box
-pub fn init<const N: usize, const M: usize>(names: &[&str; M], outputs: [Box<dyn SetPin>; N]) {
+pub fn init<T: SetPin + 'static, const N: usize, const M: usize>(
+    names: &[&str; M],
+    outputs: [T; N],
+) {
+    let boxed = outputs.map(|o| Box::new(o) as Box<dyn SetPin>);
     critical_section::with(|cs| {
-        *PIN_LOGGER.borrow(cs).borrow_mut() = Some(PinLogger::new(names, outputs));
+        *PIN_LOGGER.borrow(cs).borrow_mut() = Some(PinLogger::new(names, boxed));
     });
 }
 

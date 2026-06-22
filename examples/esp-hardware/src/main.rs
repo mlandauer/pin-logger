@@ -7,7 +7,6 @@
 )]
 #![deny(clippy::large_stack_frames)]
 
-use alloc::boxed::Box;
 use esp_backtrace as _;
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output};
@@ -36,8 +35,8 @@ fn main() -> ! {
     esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 98768);
 
     pin_logger::init!([
-        Box::new(Output::new(p.GPIO25, Level::Low, Default::default())),
-        Box::new(Output::new(p.GPIO32, Level::Low, Default::default()))
+        Output::new(p.GPIO25, Level::Low, Default::default()),
+        Output::new(p.GPIO32, Level::Low, Default::default())
     ]);
     pin_log!("Start of main");
 

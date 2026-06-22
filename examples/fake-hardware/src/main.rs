@@ -9,7 +9,7 @@ mod fake_pin;
 fn main() {
     colog::init();
 
-    pin_logger::init!([Box::new(FakePin::new(0)), Box::new(FakePin::new(1))]);
+    pin_logger::init!([FakePin::new(0), FakePin::new(1)]);
     pin_log!("Start");
     // Do something here
     pin_log!("Middle");
