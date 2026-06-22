@@ -1,14 +1,13 @@
-use alloc::format;
 use cargo_metadata::MetadataCommand;
-use std::println;
-use std::string::String;
-use std::string::ToString;
-use std::vec::Vec;
 use std::{
     cmp::max,
     env::var,
+    format,
     fs::{read_to_string, write},
     path::Path,
+    println,
+    string::{String, ToString},
+    vec::Vec,
 };
 use syn::{
     Expr, Lit,

@@ -3,11 +3,10 @@
 #![feature(const_cmp)]
 #![no_std]
 #![deny(clippy::pedantic)]
-extern crate alloc;
 #[cfg(feature = "build")]
 extern crate std;
 
-use alloc::string::String;
+use core::str::from_utf8;
 use embedded_hal::digital::OutputPin;
 use log::info;
 
@@ -43,8 +42,10 @@ impl<P: OutputPin, const N: usize> PinLogger<P, N> {
 
     pub fn pin_log(&mut self, pin_state: usize, name: &str) {
         let before = self.binary_string(self.pin_state);
+        let before = from_utf8(&before).unwrap();
         self.pin_state = pin_state;
         let after = self.binary_string(self.pin_state);
+        let after = from_utf8(&after).unwrap();
         self.set_outputs(self.pin_state);
         info!("{before}->{after}: {name}");
     }
@@ -63,11 +64,11 @@ impl<P: OutputPin, const N: usize> PinLogger<P, N> {
     }
 
     // TODO: Do this the same way as in build
-    fn binary_string(&self, pin_state: usize) -> String {
+    fn binary_string(&self, pin_state: usize) -> [u8; N] {
         let mut c = pin_state;
-        let mut s = String::new();
-        for _ in &self.outputs {
-            s += if c & 1 == 0 { "0" } else { "1" };
+        let mut s = [0u8; N];
+        for byte in &mut s {
+            *byte = if c & 1 == 0 { b'0' } else { b'1' };
             c >>= 1;
         }
         s
