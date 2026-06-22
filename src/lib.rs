@@ -87,9 +87,10 @@ impl PinLogger {
     }
 }
 
-// TODO: Hide documentation
+#[doc(hidden)]
 pub mod internal;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! load_names {
     ($name:ident, $length:ident) => {
