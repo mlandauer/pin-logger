@@ -11,8 +11,6 @@ pub fn init<const N: usize, const M: usize>(names: &[&str; M], outputs: [Box<dyn
     });
 }
 
-/// # Panics
-/// init needs to be called first before doing anything else. Otherwise this will panic
 pub fn pin_log(pin_state: usize, name: &str) {
     critical_section::with(|cs| {
         let mut borrow_mut = PIN_LOGGER.borrow(cs).borrow_mut();
