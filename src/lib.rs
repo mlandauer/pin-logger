@@ -19,14 +19,14 @@ const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
-struct PinLogger {
+pub struct PinLogger {
     pin_state: usize,
     outputs: Vec<Box<dyn SetPin>>,
 }
 
 impl PinLogger {
     // TODO: It would be nice if we could pass more pins and if there are too many the end ones are discarded
-    fn new<const N: usize, const M: usize>(
+    pub fn new<const N: usize, const M: usize>(
         // We don't need the array, just the size
         _names: &[&str; M],
         outputs: [Box<dyn SetPin>; N],
@@ -42,7 +42,7 @@ impl PinLogger {
         }
     }
 
-    fn pin_log(&mut self, pin_state: usize, name: &str) {
+    pub fn pin_log(&mut self, pin_state: usize, name: &str) {
         let before = self.binary_string(self.pin_state);
         self.pin_state = pin_state;
         let after = self.binary_string(self.pin_state);
@@ -99,10 +99,10 @@ macro_rules! load_names {
 ///
 #[macro_export]
 macro_rules! pin_log {
-    ($name:literal) => {{
+    ($logger:ident, $name:literal) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
         const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name).unwrap();
-        pin_logger::internal::pin_log(PIN_STATE, $name);
+        $logger.pin_log(PIN_STATE, $name);
     }};
 }
 
@@ -123,6 +123,6 @@ macro_rules! init {
     ($($output:expr),* $(,)?) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
         // Boxing here so that we don't actually need all the pins to have the same type
-        pin_logger::internal::init(&NAMES, [$(alloc::boxed::Box::new($output)),*]);
+        pin_logger::PinLogger::new(&NAMES, [$(alloc::boxed::Box::new($output)),*])
     }};
 }

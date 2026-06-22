@@ -11,10 +11,10 @@ mod fake_pin;
 fn main() {
     colog::init();
 
-    pin_logger::init!(FakePin::new(0), FakePin::new(1));
-    pin_log!("Start");
+    let mut l = pin_logger::init!(FakePin::new(0), FakePin::new(1));
+    pin_log!(l, "Start");
     // Do something here
-    pin_log!("Middle");
+    pin_log!(l, "Middle");
     // Do something more here
-    pin_log!("End")
+    pin_log!(l, "End")
 }

@@ -34,17 +34,17 @@ fn main() -> ! {
 
     esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 98768);
 
-    pin_logger::init!(
+    let mut l = pin_logger::init!(
         Output::new(p.GPIO25, Level::Low, Default::default()),
         Output::new(p.GPIO32, Level::Low, Default::default())
     );
-    pin_log!("Start of main");
+    pin_log!(l, "Start of main");
 
     loop {
-        pin_log!("Start of main loop");
+        pin_log!(l, "Start of main loop");
         info!("Hello world!");
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_millis(500) {}
-        pin_log!("End of main loop");
+        pin_log!(l, "End of main loop");
     }
 }

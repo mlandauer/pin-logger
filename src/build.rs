@@ -193,7 +193,7 @@ impl<'ast> Visit<'ast> for Visitor<'_> {
             if let Ok(args) = args {
                 if let Some(Expr::Lit(syn::ExprLit {
                     lit: Lit::Str(s), ..
-                })) = args.first()
+                })) = args.get(1)
                 {
                     let name = s.value();
                     let line = s.span().start().line;

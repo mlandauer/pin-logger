@@ -1,7 +1,3 @@
-use crate::PinLogger;
-use alloc::boxed::Box;
-use core::cell::RefCell;
-use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
 
 pub trait SetPin: Send {
@@ -17,24 +13,6 @@ impl<P: OutputPin + Send> SetPin for P {
     fn set_high(&mut self) {
         let _ = OutputPin::set_high(self);
     }
-}
-
-static PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
-
-pub fn init<const N: usize, const M: usize>(names: &[&str; M], outputs: [Box<dyn SetPin>; N]) {
-    critical_section::with(|cs| {
-        *PIN_LOGGER.borrow(cs).borrow_mut() = Some(PinLogger::new(names, outputs));
-    });
-}
-
-pub fn pin_log(pin_state: usize, name: &str) {
-    critical_section::with(|cs| {
-        let mut borrow_mut = PIN_LOGGER.borrow(cs).borrow_mut();
-        let pin_logger = borrow_mut
-            .as_mut()
-            .expect("call init before calling pin_log!");
-        pin_logger.pin_log(pin_state, name);
-    });
 }
 
 #[must_use]
