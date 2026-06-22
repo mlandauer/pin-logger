@@ -7,10 +7,9 @@ extern crate alloc;
 #[cfg(feature = "build")]
 extern crate std;
 
-use alloc::{boxed::Box, string::String, vec::Vec};
+use alloc::string::String;
+use embedded_hal::digital::OutputPin;
 use log::info;
-
-use crate::internal::SetPin;
 
 #[cfg(feature = "build")]
 pub mod build;
@@ -19,22 +18,22 @@ const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
-pub struct PinLogger {
+pub struct PinLogger<P: OutputPin, const N: usize> {
     pin_state: usize,
-    outputs: Vec<Box<dyn SetPin>>,
+    outputs: [P; N],
 }
 
-impl PinLogger {
+impl<P: OutputPin, const N: usize> PinLogger<P, N> {
     // TODO: It would be nice if we could pass more pins and if there are too many the end ones are discarded
-    pub fn new<const N: usize, const M: usize>(
+    pub fn new<const M: usize>(
         // We don't need the array, just the size
         _names: &[&str; M],
-        outputs: [Box<dyn SetPin>; N],
+        mut outputs: [P; N],
     ) -> Self {
         const { assert!(no_pins(M) == N, "Incorrect number of pins passed in init") };
-        let mut outputs: Vec<_> = outputs.into_iter().collect();
         for output in &mut outputs {
-            output.set_low();
+            // TODO: Do we want to panic here or return an error or ignore it?
+            output.set_low().unwrap();
         }
         Self {
             pin_state: 0,
@@ -53,10 +52,11 @@ impl PinLogger {
     fn set_outputs(&mut self, pin_state: usize) {
         let mut c = pin_state;
         for output in &mut self.outputs {
+            // TODO: Do we want to panic here or return an error or ignore it?
             if c & 1 == 0 {
-                output.set_low();
+                output.set_low().unwrap();
             } else {
-                output.set_high();
+                output.set_high().unwrap();
             }
             c >>= 1;
         }
@@ -123,6 +123,6 @@ macro_rules! init {
     ($($output:expr),* $(,)?) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
         // Boxing here so that we don't actually need all the pins to have the same type
-        pin_logger::PinLogger::new(&NAMES, [$(alloc::boxed::Box::new($output)),*])
+        pin_logger::PinLogger::new(&NAMES, [$($output),*])
     }};
 }
