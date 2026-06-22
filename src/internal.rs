@@ -1,7 +1,23 @@
-use crate::{PinLogger, SetPin};
+use crate::PinLogger;
 use alloc::boxed::Box;
 use core::cell::RefCell;
 use critical_section::Mutex;
+use embedded_hal::digital::OutputPin;
+
+pub trait SetPin: Send {
+    fn set_low(&mut self);
+    fn set_high(&mut self);
+}
+
+impl<P: OutputPin + Send> SetPin for P {
+    fn set_low(&mut self) {
+        let _ = OutputPin::set_low(self);
+    }
+
+    fn set_high(&mut self) {
+        let _ = OutputPin::set_high(self);
+    }
+}
 
 static PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
 

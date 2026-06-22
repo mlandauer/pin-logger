@@ -8,29 +8,15 @@ extern crate alloc;
 extern crate std;
 
 use alloc::{boxed::Box, string::String, vec::Vec};
-use embedded_hal::digital::OutputPin;
 use log::info;
+
+use crate::internal::SetPin;
 
 #[cfg(feature = "build")]
 pub mod build;
 
 const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
-}
-
-pub trait SetPin: Send {
-    fn set_low(&mut self);
-    fn set_high(&mut self);
-}
-
-impl<P: OutputPin + Send> SetPin for P {
-    fn set_low(&mut self) {
-        let _ = OutputPin::set_low(self);
-    }
-
-    fn set_high(&mut self) {
-        let _ = OutputPin::set_high(self);
-    }
 }
 
 struct PinLogger {
