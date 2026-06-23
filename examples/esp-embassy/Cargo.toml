@@ -27,7 +27,10 @@ esp-println = { version = "0.17.0", features = ["esp32", "log-04"] }
 
 critical-section = "1.2.0"
 static_cell      = "2.1.1"
+pin-logger = { path = "../../" }
 
+[build-dependencies]
+pin-logger = { path = "../../", features = ["build"] }
 
 # For fine tuning these settings, please refer to https://doc.rust-lang.org/cargo/reference/profiles.html
 [profile.dev]

@@ -1,4 +1,5 @@
 fn main() {
+    pin_logger::build::scan_source_for_pin_logs(std::path::Path::new("pin_logs.txt"));
     linker_be_nice();
     // make sure linkall.x is the last linker script (otherwise might cause problems with flip-link)
     println!("cargo:rustc-link-arg=-Tlinkall.x");
