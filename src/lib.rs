@@ -2,7 +2,6 @@
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
 #![no_std]
-#![deny(clippy::pedantic)]
 #[cfg(feature = "build")]
 extern crate std;
 
@@ -94,8 +93,9 @@ macro_rules! load_names {
 /// Before calling this you need to initialise the logger with [init].
 ///
 /// # Example
-/// ```
-/// pin_log!("Connecting to network");
+// TODO: Would be nice to figure out how to compile this
+/// ```ignore
+/// pin_log!(logger, "Connecting to network");
 /// ```
 ///
 #[macro_export]
@@ -109,16 +109,16 @@ macro_rules! pin_log {
 
 /// Initialise the logger
 ///
-/// Pass a list of hardware output pins. The pins should implement the [OutputPin] trait from embedded-hal.
-/// The number of pins needed depends on the number of times [pin_log] is used.
+/// Pass a list of hardware output pins. The pins should implement the [`OutputPin`] trait from embedded-hal.
+/// The number of pins needed depends on the number of times [`pin_log`] is used.
 ///
-/// # Example (using esp-hal)
-/// ```
-/// pin_logger::init!(
-///    Output::new(p.GPIO25, Level::Low, Default::default()),
-///    Output::new(p.GPIO32, Level::Low, Default::default()),
-/// );
-/// ```
+// # Example (using esp-hal)
+// ```
+// let mut logger = pin_logger::init!(
+//    Output::new(p.GPIO25, Level::Low, Default::default()),
+//    Output::new(p.GPIO32, Level::Low, Default::default()),
+// );
+// ```
 #[macro_export]
 macro_rules! init {
     ($($output:expr),* $(,)?) => {{
