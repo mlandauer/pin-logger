@@ -24,9 +24,6 @@ esp_bootloader_esp_idf::esp_app_desc!();
 )]
 #[esp_rtos::main]
 async fn main(spawner: Spawner) -> ! {
-    // generator version: 1.3.0
-    // generator parameters: --chip esp32 -o unstable-hal -o embassy -o log -o esp-backtrace
-
     esp_println::logger::init_logger_from_env();
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
@@ -39,13 +36,18 @@ async fn main(spawner: Spawner) -> ! {
 
     info!("Embassy initialized!");
 
-    // TODO: Spawn some tasks
-    let _ = spawner;
+    spawner.spawn(task().unwrap());
 
     loop {
-        info!("Hello world!");
-        Timer::after(Duration::from_secs(1)).await;
+        info!("Hello from the main loop!");
+        Timer::after(Duration::from_millis(500)).await;
     }
+}
 
-    // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.1.0/examples
+#[embassy_executor::task]
+async fn task() {
+    loop {
+        info!("Hello from the task!");
+        Timer::after(Duration::from_millis(700)).await;
+    }
 }
