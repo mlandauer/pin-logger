@@ -91,7 +91,7 @@ macro_rules! load_names {
 
 /// Log a message to the output pins
 ///
-/// Before calling this you need to initialise the logger with `init`.
+/// Before calling this you need to initialise the logger with [init].
 ///
 /// # Example
 /// ```
@@ -109,8 +109,8 @@ macro_rules! pin_log {
 
 /// Initialise the logger
 ///
-/// Pass a list of hardware output pins. The pins should implement the `OutputPin` trait from embedded-hal.
-/// The number of pins needed depends on the number of times `pin_log` is used.
+/// Pass a list of hardware output pins. The pins should implement the [OutputPin] trait from embedded-hal.
+/// The number of pins needed depends on the number of times [pin_log] is used.
 ///
 /// # Example (using esp-hal)
 /// ```
