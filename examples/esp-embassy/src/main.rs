@@ -45,16 +45,20 @@ async fn main(spawner: Spawner) -> ! {
 
     info!("Embassy initialized!");
 
-    static PIN0_CELL: StaticCell<Output> = StaticCell::new();
-    let pin0 = PIN0_CELL.init(Output::new(
+    let pins = [Output::new(
         peripherals.GPIO25,
         Level::Low,
         Default::default(),
-    )) as &mut dyn SetPin;
+    )];
+    let pins = pins.map(|pin| {
+        static PIN_CELL: StaticCell<Output> = StaticCell::new();
+        PIN_CELL.init(pin) as &mut dyn SetPin
+    });
+
     pin_logger::load_names!(NAMES, NAMES_LEN);
     static PINS_CELL: StaticCell<[&mut dyn SetPin; pin_logger::no_pins(NAMES.len())]> =
         StaticCell::new();
-    let pins = PINS_CELL.init([pin0]);
+    let pins = PINS_CELL.init(pins);
 
     static MUTEX_PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
     critical_section::with(|cs| {
