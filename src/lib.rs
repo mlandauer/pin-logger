@@ -5,12 +5,15 @@
 #[cfg(feature = "build")]
 extern crate std;
 
-use core::str::from_utf8;
+use core::{cell::RefCell, str::from_utf8};
+use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
 use log::info;
 
 #[cfg(feature = "build")]
 pub mod build;
+
+pub static MUTEX_PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
 
 pub const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize

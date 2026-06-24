@@ -7,9 +7,6 @@
 )]
 #![deny(clippy::large_stack_frames)]
 
-use core::cell::RefCell;
-
-use critical_section::Mutex;
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
@@ -19,8 +16,8 @@ use esp_hal::{
     timer::timg::TimerGroup,
 };
 use log::info;
+use pin_logger::SetPin;
 use pin_logger::pin_log;
-use pin_logger::{PinLogger, SetPin};
 use static_cell::StaticCell;
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
@@ -50,6 +47,7 @@ async fn main(spawner: Spawner) -> ! {
         Level::Low,
         Default::default(),
     )];
+
     let pins = pins.map(|pin| {
         static PIN_CELL: StaticCell<Output> = StaticCell::new();
         PIN_CELL.init(pin) as &mut dyn SetPin
@@ -60,9 +58,8 @@ async fn main(spawner: Spawner) -> ! {
         StaticCell::new();
     let pins = PINS_CELL.init(pins);
 
-    static MUTEX_PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
     critical_section::with(|cs| {
-        MUTEX_PIN_LOGGER
+        pin_logger::MUTEX_PIN_LOGGER
             .borrow(cs)
             .replace(Some(pin_logger::init2!(pins)));
     });
@@ -71,7 +68,7 @@ async fn main(spawner: Spawner) -> ! {
 
     loop {
         critical_section::with(|cs| {
-            let mut foo = MUTEX_PIN_LOGGER.borrow(cs).borrow_mut();
+            let mut foo = pin_logger::MUTEX_PIN_LOGGER.borrow(cs).borrow_mut();
             let l = foo.as_mut().unwrap();
             pin_log!(l, "Hello from the main loop");
         });
