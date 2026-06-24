@@ -21,6 +21,7 @@ use esp_hal::{
 use log::info;
 use pin_logger::PinLogger;
 use pin_logger::pin_log;
+use pin_logger::pin_log_mutex;
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
@@ -56,11 +57,7 @@ async fn main(spawner: Spawner) -> ! {
     spawner.spawn(task().unwrap());
 
     loop {
-        critical_section::with(|cs| {
-            let mut borrow = MUTEX_PIN_LOGGER.borrow(cs).borrow_mut();
-            let l = borrow.as_mut().unwrap();
-            pin_log!(l, "Hello from the main loop");
-        });
+        pin_log_mutex!(MUTEX_PIN_LOGGER, "Hello from the main loop");
         Timer::after(Duration::from_millis(500)).await;
     }
 }
@@ -68,12 +65,7 @@ async fn main(spawner: Spawner) -> ! {
 #[embassy_executor::task]
 async fn task() {
     loop {
-        critical_section::with(|cs| {
-            let mut borrow = MUTEX_PIN_LOGGER.borrow(cs).borrow_mut();
-            let l = borrow.as_mut().unwrap();
-            pin_log!(l, "Hello from the task!");
-        });
-        // info!("Hello from the task!");
+        pin_log_mutex!(MUTEX_PIN_LOGGER, "Hello from the task!");
         Timer::after(Duration::from_millis(700)).await;
     }
 }

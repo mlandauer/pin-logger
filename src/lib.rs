@@ -146,3 +146,14 @@ macro_rules! init2 {
         pin_logger::PinLogger::new(&NAMES, $output)
     }};
 }
+
+#[macro_export]
+macro_rules! pin_log_mutex {
+    ($mutex:ident, $name:literal) => {{
+        critical_section::with(|cs| {
+            let mut borrow = $mutex.borrow(cs).borrow_mut();
+            let l = borrow.as_mut().unwrap();
+            pin_log!(l, $name);
+        });
+    }};
+}
