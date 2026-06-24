@@ -7,9 +7,6 @@
 )]
 #![deny(clippy::large_stack_frames)]
 
-use core::cell::RefCell;
-
-use critical_section::Mutex;
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
@@ -19,15 +16,13 @@ use esp_hal::{
     timer::timg::TimerGroup,
 };
 use log::info;
-use pin_logger::pin_log_mutex;
-use pin_logger::{PinLogger, init_mutex};
-use pin_logger::{Static, pin_log};
+use pin_logger::{Static, init_mutex, pin_log, pin_log_mutex};
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
 
-static MUTEX_PIN_LOGGER: Static<Output, 2> = Mutex::new(RefCell::new(None));
+static MUTEX_PIN_LOGGER: Static<Output, 2> = pin_logger::init_static();
 
 #[allow(
     clippy::large_stack_frames,

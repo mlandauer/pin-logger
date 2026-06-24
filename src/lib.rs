@@ -15,6 +15,11 @@ pub mod build;
 
 pub type Static<T, const N: usize> = Mutex<RefCell<Option<PinLogger<T, N>>>>;
 
+pub const fn init_static<P: OutputPin, const N: usize>() -> Mutex<RefCell<Option<PinLogger<P, N>>>>
+{
+    Mutex::new(RefCell::new(None))
+}
+
 const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
