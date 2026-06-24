@@ -20,7 +20,7 @@ pub const fn init_static<P: OutputPin, const N: usize>() -> Mutex<RefCell<Option
     Mutex::new(RefCell::new(None))
 }
 
-const fn no_pins(names_len: usize) -> usize {
+pub const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
@@ -152,6 +152,15 @@ macro_rules! init2 {
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
         // Boxing here so that we don't actually need all the pins to have the same type
         pin_logger::PinLogger::new(&NAMES, $output)
+    }};
+}
+
+// TODO: Reference things relative to this crate in the macro
+#[macro_export]
+macro_rules! no_pins {
+    () => {{
+        pin_logger::load_names!(NAMES, NAMES_LENGTH);
+        pin_logger::no_pins(NAMES_LENGTH)
     }};
 }
 
