@@ -48,9 +48,12 @@ async fn main(spawner: Spawner) -> ! {
         Level::Low,
         Default::default(),
     )) as &mut dyn SetPin;
-    static PINS_CELL: StaticCell<[&mut dyn SetPin; 1]> = StaticCell::new();
+    pin_logger::load_names!(NAMES, NAMES_LEN);
+    static PINS_CELL: StaticCell<[&mut dyn SetPin; pin_logger::no_pins(NAMES.len())]> =
+        StaticCell::new();
     let pins = PINS_CELL.init([pin0]);
     let mut l = pin_logger::init2!(pins);
+
     spawner.spawn(task().unwrap());
 
     loop {

@@ -12,7 +12,7 @@ use log::info;
 #[cfg(feature = "build")]
 pub mod build;
 
-const fn no_pins(names_len: usize) -> usize {
+pub const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
