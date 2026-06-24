@@ -16,9 +16,7 @@ use esp_hal::{
     timer::timg::TimerGroup,
 };
 use log::info;
-use pin_logger::SetPin;
 use pin_logger::pin_log;
-use static_cell::StaticCell;
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
@@ -42,36 +40,16 @@ async fn main(spawner: Spawner) -> ! {
 
     info!("Embassy initialized!");
 
-    let pins = [Output::new(
+    let mut l = pin_logger::init2!([Output::new(
         peripherals.GPIO25,
         Level::Low,
         Default::default(),
-    )];
-
-    let pins = pins.map(|pin| {
-        static PIN_CELL: StaticCell<Output> = StaticCell::new();
-        PIN_CELL.init(pin) as &mut dyn SetPin
-    });
-
-    pin_logger::load_names!(NAMES, NAMES_LEN);
-    static PINS_CELL: StaticCell<[&mut dyn SetPin; pin_logger::no_pins(NAMES.len())]> =
-        StaticCell::new();
-    let pins = PINS_CELL.init(pins);
-
-    critical_section::with(|cs| {
-        pin_logger::MUTEX_PIN_LOGGER
-            .borrow(cs)
-            .replace(Some(pin_logger::init2!(pins)));
-    });
+    )]);
 
     spawner.spawn(task().unwrap());
 
     loop {
-        critical_section::with(|cs| {
-            let mut foo = pin_logger::MUTEX_PIN_LOGGER.borrow(cs).borrow_mut();
-            let l = foo.as_mut().unwrap();
-            pin_log!(l, "Hello from the main loop");
-        });
+        pin_log!(l, "Hello from the main loop");
         Timer::after(Duration::from_millis(500)).await;
     }
 }

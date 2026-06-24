@@ -5,53 +5,41 @@
 #[cfg(feature = "build")]
 extern crate std;
 
-use core::{cell::RefCell, str::from_utf8};
-use critical_section::Mutex;
+use core::str::from_utf8;
 use embedded_hal::digital::OutputPin;
 use log::info;
 
 #[cfg(feature = "build")]
 pub mod build;
 
-pub static MUTEX_PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
-
-pub const fn no_pins(names_len: usize) -> usize {
+const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
-pub trait SetPin: Send {
-    fn set_low(&mut self);
-    fn set_high(&mut self);
-}
-
-impl<P: OutputPin + Send> SetPin for P {
-    fn set_low(&mut self) {
-        let _ = OutputPin::set_low(self);
-    }
-
-    fn set_high(&mut self) {
-        let _ = OutputPin::set_high(self);
-    }
-}
-
-pub struct PinLogger<'a> {
+pub struct PinLogger<P, const N: usize>
+where
+    P: OutputPin,
+{
     pin_state: usize,
-    outputs: &'a mut [&'a mut dyn SetPin],
+    outputs: [P; N],
 }
 
-impl PinLogger<'static> {
+impl<P, const N: usize> PinLogger<P, N>
+where
+    P: OutputPin,
+{
     // TODO: It would be nice if we could pass more pins and if there are too many the end ones are discarded
     pub fn new<const M: usize>(
         // We don't need the array, just the size
         _names: &[&str; M],
-        outputs: &'static mut [&'static mut dyn SetPin],
+        mut outputs: [P; N],
     ) -> Self {
         assert!(
             no_pins(M) == outputs.len(),
             "Incorrect number of pins passed in init"
         );
         for output in outputs.iter_mut() {
-            output.set_low();
+            output.set_low().unwrap();
         }
         Self {
             pin_state: 0,
@@ -59,11 +47,11 @@ impl PinLogger<'static> {
         }
     }
 
-    pub fn pin_log<const N: usize>(&mut self, _names: &[&str; N], pin_state: usize, name: &str) {
-        let before = self.binary_string::<N>(self.pin_state);
+    pub fn pin_log(&mut self, pin_state: usize, name: &str) {
+        let before = self.binary_string(self.pin_state);
         let before = from_utf8(&before).unwrap();
         self.pin_state = pin_state;
-        let after = self.binary_string::<N>(self.pin_state);
+        let after = self.binary_string(self.pin_state);
         let after = from_utf8(&after).unwrap();
         self.set_outputs(self.pin_state);
         info!("{before}->{after}: {name}");
@@ -74,16 +62,16 @@ impl PinLogger<'static> {
         for output in self.outputs.iter_mut() {
             // TODO: Do we want to panic here or return an error or ignore it?
             if c & 1 == 0 {
-                output.set_low();
+                output.set_low().unwrap();
             } else {
-                output.set_high();
+                output.set_high().unwrap();
             }
             c >>= 1;
         }
     }
 
     // TODO: Do this the same way as in build
-    fn binary_string<const N: usize>(&self, pin_state: usize) -> [u8; N] {
+    fn binary_string(&self, pin_state: usize) -> [u8; N] {
         let mut c = pin_state;
         let mut s = [0u8; N];
         for byte in &mut s {
@@ -123,7 +111,7 @@ macro_rules! pin_log {
     ($logger:ident, $name:literal) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
         const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name).unwrap();
-        $logger.pin_log(&NAMES, PIN_STATE, $name);
+        $logger.pin_log(PIN_STATE, $name);
     }};
 }
 
