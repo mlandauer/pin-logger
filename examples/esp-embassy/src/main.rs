@@ -19,9 +19,9 @@ use esp_hal::{
     timer::timg::TimerGroup,
 };
 use log::info;
-use pin_logger::PinLogger;
 use pin_logger::pin_log;
 use pin_logger::pin_log_mutex;
+use pin_logger::{PinLogger, init_mutex};
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
@@ -48,12 +48,13 @@ async fn main(spawner: Spawner) -> ! {
 
     info!("Embassy initialized!");
 
-    let l = pin_logger::init2!([
-        Output::new(peripherals.GPIO25, Level::Low, Default::default()),
-        Output::new(peripherals.GPIO32, Level::Low, Default::default()),
-    ]);
-
-    critical_section::with(|cs| MUTEX_PIN_LOGGER.borrow(cs).replace(Some(l)));
+    init_mutex!(
+        MUTEX_PIN_LOGGER,
+        [
+            Output::new(peripherals.GPIO25, Level::Low, Default::default()),
+            Output::new(peripherals.GPIO32, Level::Low, Default::default()),
+        ]
+    );
     spawner.spawn(task().unwrap());
 
     loop {

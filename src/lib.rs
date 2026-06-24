@@ -148,6 +148,13 @@ macro_rules! init2 {
 }
 
 #[macro_export]
+macro_rules! init_mutex {
+    ($mutex:ident, $output:expr) => {
+        critical_section::with(|cs| $mutex.borrow(cs).replace(Some(pin_logger::init2!($output))));
+    };
+}
+
+#[macro_export]
 macro_rules! pin_log_mutex {
     ($mutex:ident, $name:literal) => {{
         critical_section::with(|cs| {
