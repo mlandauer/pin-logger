@@ -16,8 +16,8 @@ use esp_hal::{
     timer::timg::TimerGroup,
 };
 use log::info;
-use pin_logger::SetPin;
 use pin_logger::pin_log;
+use pin_logger::{PinLogger, SetPin};
 use static_cell::StaticCell;
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
@@ -52,7 +52,8 @@ async fn main(spawner: Spawner) -> ! {
     static PINS_CELL: StaticCell<[&mut dyn SetPin; pin_logger::no_pins(NAMES.len())]> =
         StaticCell::new();
     let pins = PINS_CELL.init([pin0]);
-    let mut l = pin_logger::init2!(pins);
+    static PIN_LOGGER: StaticCell<PinLogger> = StaticCell::new();
+    let l = PIN_LOGGER.init(pin_logger::init2!(pins));
 
     spawner.spawn(task().unwrap());
 
