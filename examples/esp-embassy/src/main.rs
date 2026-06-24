@@ -7,6 +7,9 @@
 )]
 #![deny(clippy::large_stack_frames)]
 
+use core::cell::RefCell;
+
+use critical_section::Mutex;
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
@@ -52,13 +55,22 @@ async fn main(spawner: Spawner) -> ! {
     static PINS_CELL: StaticCell<[&mut dyn SetPin; pin_logger::no_pins(NAMES.len())]> =
         StaticCell::new();
     let pins = PINS_CELL.init([pin0]);
-    static PIN_LOGGER: StaticCell<PinLogger> = StaticCell::new();
-    let l = PIN_LOGGER.init(pin_logger::init2!(pins));
+
+    static MUTEX_PIN_LOGGER: Mutex<RefCell<Option<PinLogger>>> = Mutex::new(RefCell::new(None));
+    critical_section::with(|cs| {
+        MUTEX_PIN_LOGGER
+            .borrow(cs)
+            .replace(Some(pin_logger::init2!(pins)));
+    });
 
     spawner.spawn(task().unwrap());
 
     loop {
-        pin_log!(l, "Hello from the main loop");
+        critical_section::with(|cs| {
+            let mut foo = MUTEX_PIN_LOGGER.borrow(cs).borrow_mut();
+            let l = foo.as_mut().unwrap();
+            pin_log!(l, "Hello from the main loop");
+        });
         Timer::after(Duration::from_millis(500)).await;
     }
 }

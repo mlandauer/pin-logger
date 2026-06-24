@@ -16,12 +16,12 @@ pub const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
 }
 
-pub trait SetPin {
+pub trait SetPin: Send {
     fn set_low(&mut self);
     fn set_high(&mut self);
 }
 
-impl<P: OutputPin> SetPin for P {
+impl<P: OutputPin + Send> SetPin for P {
     fn set_low(&mut self) {
         let _ = OutputPin::set_low(self);
     }
