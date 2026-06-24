@@ -92,6 +92,7 @@ macro_rules! load_names {
         // TODO: Give a nice error message if included file doesn't exist (to add build script)
         // TODO: Give nice error message when OUT_DIR env variables doesn't exist
         const $length: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
+        assert!($length > 0);
         const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/names.rs"));
     };
 }
@@ -110,7 +111,8 @@ macro_rules! load_names {
 macro_rules! pin_log {
     ($logger:ident, $name:literal) => {{
         pin_logger::load_names!(NAMES, NAMES_LENGTH);
-        const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name).unwrap();
+        const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name)
+            .expect("name not found in registry");
         $logger.pin_log(PIN_STATE, $name);
     }};
 }
