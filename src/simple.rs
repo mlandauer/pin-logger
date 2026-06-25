@@ -10,8 +10,8 @@ pub struct PinLogger<P, const N: usize>
 where
     P: OutputPin,
 {
-    pub(crate) pin_state: usize,
-    pub(crate) outputs: [P; N],
+    pin_state: usize,
+    outputs: [P; N],
 }
 
 impl<P, const N: usize> PinLogger<P, N>
