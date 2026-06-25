@@ -25,27 +25,6 @@ pub mod simple;
 #[doc(hidden)]
 pub mod internal;
 
-/// Initialise the logger
-///
-/// Pass an array of hardware output pins. The pins should implement the [`OutputPin`] trait from embedded-hal.
-/// The number of pins needed depends on the number of times [`pin_log`] is used.
-///
-// # Example (using esp-hal)
-// ```
-// let mut logger = pin_logger::init!([
-//    Output::new(p.GPIO25, Level::Low, Default::default()),
-//    Output::new(p.GPIO32, Level::Low, Default::default()),
-// ]);
-// ```
-#[macro_export]
-macro_rules! init {
-    ($output:expr) => {{
-        $crate::load_names!(NAMES, NAMES_LENGTH);
-        // Boxing here so that we don't actually need all the pins to have the same type
-        $crate::simple::PinLogger::new(&NAMES, $output)
-    }};
-}
-
 #[macro_export]
 macro_rules! global_static {
     ($mutex:ident, $pin_type:ty) => {
@@ -56,10 +35,26 @@ macro_rules! global_static {
     };
 }
 
+/// Initialise the logger
+///
+/// Pass an array of hardware output pins. The pins should implement the [`OutputPin`] trait from embedded-hal.
+/// The number of pins needed depends on the number of times [`pin_log`] is used.
+///
+// # Example (using esp-hal)
+// ```
+// pin_logger::init_mutex!([
+//    Output::new(p.GPIO25, Level::Low, Default::default()),
+//    Output::new(p.GPIO32, Level::Low, Default::default()),
+// ]);
+// ```
 #[macro_export]
 macro_rules! init_mutex {
     ($mutex:ident, $output:expr) => {
-        critical_section::with(|cs| $mutex.borrow(cs).replace(Some($crate::init!($output))));
+        critical_section::with(|cs| {
+            $crate::load_names!(NAMES, NAMES_LENGTH);
+            let logger = $crate::simple::PinLogger::new(&NAMES, $output);
+            $mutex.borrow(cs).replace(Some(logger));
+        });
     };
     ($output:expr) => {
         $crate::init_mutex!(PIN_LOGGER, $output);
