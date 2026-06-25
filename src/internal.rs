@@ -42,11 +42,7 @@ where
     P: OutputPin,
 {
     // TODO: It would be nice if we could pass more pins and if there are too many the end ones are discarded
-    pub fn new<const M: usize>(
-        // We don't need the array, just the size
-        _names: &[&str; M],
-        mut outputs: [P; N],
-    ) -> Self {
+    pub fn new(mut outputs: [P; N]) -> Self {
         for output in outputs.iter_mut() {
             output.set_low().unwrap();
         }

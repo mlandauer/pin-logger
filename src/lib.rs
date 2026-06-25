@@ -80,7 +80,7 @@ macro_rules! init {
     ($mutex:ident, $output:expr) => {
         critical_section::with(|cs| {
             $crate::load_names!(NAMES, NAMES_LENGTH);
-            let logger = $crate::internal::PinLogger::new(&NAMES, $output);
+            let logger = $crate::internal::PinLogger::new($output);
             $mutex.borrow(cs).replace(Some(logger));
         });
     };
