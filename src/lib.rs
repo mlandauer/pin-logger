@@ -5,20 +5,8 @@
 #[cfg(feature = "build")]
 extern crate std;
 
-use core::cell::RefCell;
-use critical_section::Mutex;
-use embedded_hal::digital::OutputPin;
-
 #[cfg(feature = "build")]
 pub mod build;
-
-// TODO: Move this inside macro?
-pub type Static<T, const N: usize> = Mutex<RefCell<Option<simple::PinLogger<T, N>>>>;
-
-pub const fn init_static<P: OutputPin, const N: usize>()
--> Mutex<RefCell<Option<simple::PinLogger<P, N>>>> {
-    Mutex::new(RefCell::new(None))
-}
 
 pub mod simple;
 
@@ -28,13 +16,13 @@ pub mod internal;
 #[macro_export]
 macro_rules! global_static {
     ($mutex:ident, $pin_type:ty) => {
-        static $mutex: $crate::Static<
+        static $mutex: $crate::internal::Static<
             $pin_type,
             {
                 $crate::load_names!(NAMES, NAMES_LENGTH);
                 $crate::simple::no_pins(NAMES_LENGTH)
             },
-        > = $crate::init_static();
+        > = $crate::internal::init_static();
     };
     ($pin_type:ty) => {
         $crate::global_static!(PIN_LOGGER, $pin_type);
