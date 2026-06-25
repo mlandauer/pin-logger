@@ -164,12 +164,12 @@ macro_rules! no_pins {
 }
 
 #[macro_export]
-macro_rules! init_static {
+macro_rules! global_static {
     ($mutex:ident, $pin_type:ty) => {
         static $mutex: $crate::Static<$pin_type, { $crate::no_pins!() }> = $crate::init_static();
     };
     ($pin_type:ty) => {
-        $crate::init_static!(PIN_LOGGER, $pin_type);
+        $crate::global_static!(PIN_LOGGER, $pin_type);
     };
 }
 
