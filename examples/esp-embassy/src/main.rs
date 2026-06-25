@@ -22,8 +22,7 @@ use pin_logger::pin_log_mutex;
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
 
-static MUTEX_PIN_LOGGER: pin_logger::Static<Output, { pin_logger::no_pins!() }> =
-    pin_logger::init_static();
+pin_logger::init_static!(MUTEX_PIN_LOGGER, Output);
 
 #[allow(
     clippy::large_stack_frames,

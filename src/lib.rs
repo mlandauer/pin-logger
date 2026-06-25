@@ -164,6 +164,13 @@ macro_rules! no_pins {
 }
 
 #[macro_export]
+macro_rules! init_static {
+    ($name:ident, $pin_type:ty) => {
+        static $name: $crate::Static<$pin_type, { $crate::no_pins!() }> = $crate::init_static();
+    };
+}
+
+#[macro_export]
 macro_rules! init_mutex {
     ($mutex:ident, $output:expr) => {
         critical_section::with(|cs| $mutex.borrow(cs).replace(Some($crate::init2!($output))));
