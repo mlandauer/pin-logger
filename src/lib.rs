@@ -79,3 +79,43 @@ macro_rules! pin_log_mutex {
         $crate::pin_log_mutex!(PIN_LOGGER, $name);
     };
 }
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! load_names {
+    ($name:ident, $length:ident) => {
+        // TODO: Give a nice error message if included file doesn't exist (to add build script)
+        // TODO: Give nice error message when OUT_DIR env variables doesn't exist
+        const $length: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
+        assert!($length > 0);
+        const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/names.rs"));
+    };
+}
+
+#[macro_export]
+macro_rules! no_pins {
+    () => {{
+        $crate::load_names!(NAMES, NAMES_LENGTH);
+        $crate::simple::no_pins(NAMES_LENGTH)
+    }};
+}
+
+/// Log a message to the output pins
+///
+/// Before calling this you need to initialise the logger with [init].
+///
+/// # Example
+// TODO: Would be nice to figure out how to compile this
+/// ```ignore
+/// pin_log!(logger, "Connecting to network");
+/// ```
+///
+#[macro_export]
+macro_rules! pin_log {
+    ($logger:ident, $name:literal) => {{
+        $crate::load_names!(NAMES, NAMES_LENGTH);
+        const PIN_STATE: usize =
+            $crate::internal::pin_state_for_name(NAMES, $name).expect("name not found in registry");
+        $logger.pin_log(PIN_STATE, $name);
+    }};
+}

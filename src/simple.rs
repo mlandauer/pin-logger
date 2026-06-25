@@ -2,28 +2,8 @@ use core::str::from_utf8;
 use embedded_hal::digital::OutputPin;
 use log::info;
 
-#[doc(hidden)]
-#[macro_export]
-macro_rules! load_names {
-    ($name:ident, $length:ident) => {
-        // TODO: Give a nice error message if included file doesn't exist (to add build script)
-        // TODO: Give nice error message when OUT_DIR env variables doesn't exist
-        const $length: usize = include!(concat!(env!("OUT_DIR"), "/names_length.rs"));
-        assert!($length > 0);
-        const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/names.rs"));
-    };
-}
-
 pub const fn no_pins(names_len: usize) -> usize {
     (names_len.ilog2() + 1) as usize
-}
-
-#[macro_export]
-macro_rules! no_pins {
-    () => {{
-        $crate::load_names!(NAMES, NAMES_LENGTH);
-        $crate::simple::no_pins(NAMES_LENGTH)
-    }};
 }
 
 pub struct PinLogger<P, const N: usize>
@@ -90,24 +70,4 @@ where
         }
         s
     }
-}
-
-/// Log a message to the output pins
-///
-/// Before calling this you need to initialise the logger with [init].
-///
-/// # Example
-// TODO: Would be nice to figure out how to compile this
-/// ```ignore
-/// pin_log!(logger, "Connecting to network");
-/// ```
-///
-#[macro_export]
-macro_rules! pin_log {
-    ($logger:ident, $name:literal) => {{
-        $crate::load_names!(NAMES, NAMES_LENGTH);
-        const PIN_STATE: usize =
-            $crate::internal::pin_state_for_name(NAMES, $name).expect("name not found in registry");
-        $logger.pin_log(PIN_STATE, $name);
-    }};
 }
