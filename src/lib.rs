@@ -2,16 +2,37 @@
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
 #![no_std]
-// #![deny(missing_docs)]
+#![deny(missing_docs)]
 #[cfg(feature = "build")]
 extern crate std;
 
 #[cfg(feature = "build")]
+/// Everything related to the build script support
 pub mod build;
 
 #[doc(hidden)]
 pub mod internal;
 
+/// Creates a static in the current context which holds the logger. It's protected by a [`critical_section::Mutex`] so can be used across threads safely.
+/// By default the static is called `PIN_LOGGER` but this can be changed.
+///
+/// The parameter is the type of the output pins that you will pass to [`init`].
+///
+/// Typically you would put this in the global section of your code so it's easily accessible from anywhere. Logging is one of
+/// those few times when using a global actually makes sense.
+///
+/// # Example
+/// ```
+/// pin_logger::global_static!(Output);
+/// ```
+///
+/// If you need to choose the static name:
+/// ```
+/// pin_logger::global_static!(MY_LOGGER_NAME, Output);
+/// ```
+///
+/// For a complete example of using the library with embassy and tasks see `examples/esp-embassy`.
+///
 #[macro_export]
 macro_rules! global_static {
     ($mutex:ident, $pin_type:ty) => {
@@ -30,8 +51,10 @@ macro_rules! global_static {
 
 /// Initialise the logger
 ///
-/// Pass an array of hardware output pins. The pins should implement the [`OutputPin`] trait from embedded-hal.
+/// Pass an array of hardware output pins. The pins should implement the [`OutputPin`](embedded_hal::digital::OutputPin) trait from [`embedded-hal`](embedded_hal).
 /// The number of pins needed depends on the number of times [`pin_log`] is used.
+///
+/// Note that the type needs to match that passed to [`global_static`].
 ///
 // # Example (using esp-hal)
 // ```
@@ -40,6 +63,18 @@ macro_rules! global_static {
 //    Output::new(p.GPIO32, Level::Low, Default::default()),
 // ]);
 // ```
+//
+// Using your own static name:
+// ```
+// pin_logger::init!(
+//     MY_LOGGER_NAME,
+//     [
+//         Output::new(p.GPIO25, Level::Low, Default::default()),
+//         Output::new(p.GPIO32, Level::Low, Default::default()),
+//     ]
+// );
+// ```
+//
 #[macro_export]
 macro_rules! init {
     ($mutex:ident, $output:expr) => {
@@ -56,7 +91,7 @@ macro_rules! init {
 
 /// Log a message to the output pins
 ///
-/// Before calling this you need to initialise the logger with [init].
+/// Before calling this you need to initialise the logger with [`init`].
 ///
 /// # Example
 // TODO: Would be nice to figure out how to compile this
@@ -64,6 +99,10 @@ macro_rules! init {
 /// pin_log!("Connecting to network");
 /// ```
 ///
+/// If you're using your own static name:
+/// ```ignore
+/// pin_log!(MY_LOGGER_NAME, "Connecting to network");
+/// ```
 #[macro_export]
 macro_rules! pin_log {
     ($mutex:ident, $name:literal) => {{
