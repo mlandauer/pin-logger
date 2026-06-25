@@ -19,6 +19,8 @@ use pin_logger::pin_log;
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
 
+pin_logger::global_static!(Output);
+
 #[allow(
     clippy::large_stack_frames,
     reason = "it's not unusual to allocate larger buffers etc. in main"
@@ -30,17 +32,17 @@ fn main() -> ! {
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let p = esp_hal::init(config);
 
-    let mut l = pin_logger::init!(
+    pin_logger::init!([
         Output::new(p.GPIO25, Level::Low, Default::default()),
         Output::new(p.GPIO32, Level::Low, Default::default())
-    );
-    pin_log!(l, "Start of main");
+    ]);
+    pin_log!("Start of main");
 
     loop {
-        pin_log!(l, "Start of main loop");
+        pin_log!("Start of main loop");
         info!("Hello world!");
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_millis(500) {}
-        pin_log!(l, "End of main loop");
+        pin_log!("End of main loop");
     }
 }

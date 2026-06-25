@@ -6,13 +6,15 @@ use pin_logger::pin_log;
 
 mod fake_pin;
 
+pin_logger::global_static!(FakePin);
+
 fn main() {
     colog::init();
 
-    let mut l = pin_logger::init!(FakePin::new(0), FakePin::new(1));
-    pin_log!(l, "Start");
+    pin_logger::init!([FakePin::new(0), FakePin::new(1)]);
+    pin_log!("Start");
     // Do something here
-    pin_log!(l, "Middle");
+    pin_log!("Middle");
     // Do something more here
-    pin_log!(l, "End")
+    pin_log!("End")
 }
