@@ -36,13 +36,13 @@ macro_rules! global_static {
 ///
 // # Example (using esp-hal)
 // ```
-// pin_logger::init_mutex!([
+// pin_logger::init!([
 //    Output::new(p.GPIO25, Level::Low, Default::default()),
 //    Output::new(p.GPIO32, Level::Low, Default::default()),
 // ]);
 // ```
 #[macro_export]
-macro_rules! init_mutex {
+macro_rules! init {
     ($mutex:ident, $output:expr) => {
         critical_section::with(|cs| {
             $crate::load_names!(NAMES, NAMES_LENGTH);
@@ -51,22 +51,22 @@ macro_rules! init_mutex {
         });
     };
     ($output:expr) => {
-        $crate::init_mutex!(PIN_LOGGER, $output);
+        $crate::init!(PIN_LOGGER, $output);
     };
 }
 
 /// Log a message to the output pins
 ///
-/// Before calling this you need to initialise the logger with [init_mutex].
+/// Before calling this you need to initialise the logger with [init].
 ///
 /// # Example
 // TODO: Would be nice to figure out how to compile this
 /// ```ignore
-/// pin_log_mutex!("Connecting to network");
+/// pin_log!("Connecting to network");
 /// ```
 ///
 #[macro_export]
-macro_rules! pin_log_mutex {
+macro_rules! pin_log {
     ($mutex:ident, $name:literal) => {{
         $crate::load_names!(NAMES, NAMES_LENGTH);
         critical_section::with(|cs| {
@@ -79,7 +79,7 @@ macro_rules! pin_log_mutex {
         });
     }};
     ($name:literal) => {
-        $crate::pin_log_mutex!(PIN_LOGGER, $name);
+        $crate::pin_log!(PIN_LOGGER, $name);
     };
 }
 

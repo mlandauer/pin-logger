@@ -186,7 +186,7 @@ impl<'ast> Visit<'ast> for Visitor<'_> {
             .path
             .segments
             .last()
-            .is_some_and(|s| s.ident == "pin_log" || s.ident == "pin_log_mutex")
+            .is_some_and(|s| s.ident == "pin_log")
         {
             let args = mac.parse_body_with(Punctuated::<Expr, syn::Token![,]>::parse_terminated);
             if let Ok(args) = args {
