@@ -47,10 +47,6 @@ where
         _names: &[&str; M],
         mut outputs: [P; N],
     ) -> Self {
-        assert!(
-            no_pins(M) == outputs.len(),
-            "Incorrect number of pins passed in init"
-        );
         for output in outputs.iter_mut() {
             output.set_low().unwrap();
         }
