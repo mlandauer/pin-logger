@@ -165,8 +165,11 @@ macro_rules! no_pins {
 
 #[macro_export]
 macro_rules! init_static {
-    ($name:ident, $pin_type:ty) => {
-        static $name: $crate::Static<$pin_type, { $crate::no_pins!() }> = $crate::init_static();
+    ($mutex:ident, $pin_type:ty) => {
+        static $mutex: $crate::Static<$pin_type, { $crate::no_pins!() }> = $crate::init_static();
+    };
+    ($pin_type:ty) => {
+        $crate::init_static!(PIN_LOGGER, $pin_type);
     };
 }
 
@@ -174,6 +177,9 @@ macro_rules! init_static {
 macro_rules! init_mutex {
     ($mutex:ident, $output:expr) => {
         critical_section::with(|cs| $mutex.borrow(cs).replace(Some($crate::init2!($output))));
+    };
+    ($output:expr) => {
+        $crate::init_mutex!(PIN_LOGGER, $output);
     };
 }
 
@@ -186,4 +192,7 @@ macro_rules! pin_log_mutex {
             $crate::pin_log!(l, $name);
         });
     }};
+    ($name:literal) => {
+        $crate::pin_log_mutex!(PIN_LOGGER, $name);
+    };
 }

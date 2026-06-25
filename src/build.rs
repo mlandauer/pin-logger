@@ -192,7 +192,8 @@ impl<'ast> Visit<'ast> for Visitor<'_> {
             if let Ok(args) = args {
                 if let Some(Expr::Lit(syn::ExprLit {
                     lit: Lit::Str(s), ..
-                })) = args.get(1)
+                // The name is always the last parameter whether the macros has one or two parameters
+                })) = args.last()
                 {
                     let name = s.value();
                     let line = s.span().start().line;
