@@ -22,12 +22,12 @@ pub mod internal;
 /// those few times when using a global actually makes sense.
 ///
 /// # Example
-/// ```
+/// ```ignore
 /// pin_logger::global_static!(Output);
 /// ```
 ///
 /// If you need to choose the static name:
-/// ```
+/// ```ignore
 /// pin_logger::global_static!(MY_LOGGER_NAME, Output);
 /// ```
 ///

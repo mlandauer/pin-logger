@@ -16,7 +16,7 @@ You can do this pretty easily but as soon as you have more than a few different 
 This library aims to make this process a little less error prone.
 
 In your code you mark interesting bits with `pin_log!` messages:
-```ignore
+```rust ignore
 pin_log!("Entering main loop");
 ```
 
@@ -56,7 +56,7 @@ pin_logger = { version = "0.2", features = ["build"] }
 
 In `build.rs` (create in the root of your project if you don't already have one)
 
-```ignore
+```rust ignore
 fn main() {
     // On build put a file in the root directory that shows which output pins correspond to which log message
     pin_logger::build::scan_source_for_pin_logs(std::path::Path::new("pin_logs.txt"));
@@ -64,12 +64,12 @@ fn main() {
 ```
 
 Create the static for holding the logger so it's easily accessible everywhere
-```rust
+```rust ignore
 pin_logger::global_static!(Output);
 ```
 
 After you've initialised your embedded hardware but before you do any logging you setup the pins that will be used. On ESP this might look like:
-```rust
+```rust ignore
 pin_logger::init!(
     Output::new(p.GPIO25, Level::Low, Default::default()),
     Output::new(p.GPIO32, Level::Low, Default::default()),
