@@ -22,7 +22,7 @@ use pin_logger::pin_log_mutex;
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
 
-pin_logger::init_static!(MUTEX_PIN_LOGGER, Output);
+pin_logger::init_static!(PIN_LOGGER, Output);
 
 #[allow(
     clippy::large_stack_frames,
@@ -43,7 +43,7 @@ async fn main(spawner: Spawner) -> ! {
     info!("Embassy initialized!");
 
     pin_logger::init_mutex!(
-        MUTEX_PIN_LOGGER,
+        PIN_LOGGER,
         [
             Output::new(peripherals.GPIO25, Level::Low, Default::default()),
             Output::new(peripherals.GPIO32, Level::Low, Default::default()),
@@ -52,7 +52,7 @@ async fn main(spawner: Spawner) -> ! {
     spawner.spawn(task().unwrap());
 
     loop {
-        pin_log_mutex!(MUTEX_PIN_LOGGER, "Hello from the main loop");
+        pin_log_mutex!(PIN_LOGGER, "Hello from the main loop");
         Timer::after(Duration::from_millis(500)).await;
     }
 }
@@ -60,7 +60,7 @@ async fn main(spawner: Spawner) -> ! {
 #[embassy_executor::task]
 async fn task() {
     loop {
-        pin_log_mutex!(MUTEX_PIN_LOGGER, "Hello from the task!");
+        pin_log_mutex!(PIN_LOGGER, "Hello from the task!");
         Timer::after(Duration::from_millis(700)).await;
     }
 }
