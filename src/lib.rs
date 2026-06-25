@@ -133,13 +133,13 @@ macro_rules! pin_log {
 ///
 // # Example (using esp-hal)
 // ```
-// let mut logger = pin_logger::init2!([
+// let mut logger = pin_logger::init!([
 //    Output::new(p.GPIO25, Level::Low, Default::default()),
 //    Output::new(p.GPIO32, Level::Low, Default::default()),
 // ]);
 // ```
 #[macro_export]
-macro_rules! init2 {
+macro_rules! init {
     ($output:expr) => {{
         $crate::load_names!(NAMES, NAMES_LENGTH);
         // Boxing here so that we don't actually need all the pins to have the same type
@@ -168,7 +168,7 @@ macro_rules! global_static {
 #[macro_export]
 macro_rules! init_mutex {
     ($mutex:ident, $output:expr) => {
-        critical_section::with(|cs| $mutex.borrow(cs).replace(Some($crate::init2!($output))));
+        critical_section::with(|cs| $mutex.borrow(cs).replace(Some($crate::init!($output))));
     };
     ($output:expr) => {
         $crate::init_mutex!(PIN_LOGGER, $output);
