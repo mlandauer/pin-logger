@@ -61,13 +61,27 @@ macro_rules! init_mutex {
     };
 }
 
+/// Log a message to the output pins
+///
+/// Before calling this you need to initialise the logger with [init_mutex].
+///
+/// # Example
+// TODO: Would be nice to figure out how to compile this
+/// ```ignore
+/// pin_log_mutex!("Connecting to network");
+/// ```
+///
 #[macro_export]
 macro_rules! pin_log_mutex {
     ($mutex:ident, $name:literal) => {{
+        $crate::load_names!(NAMES, NAMES_LENGTH);
         critical_section::with(|cs| {
             let mut borrow = $mutex.borrow(cs).borrow_mut();
-            let l = borrow.as_mut().unwrap();
-            $crate::pin_log!(l, $name);
+            let logger = borrow.as_mut().unwrap();
+
+            const PIN_STATE: usize = $crate::internal::pin_state_for_name(NAMES, $name)
+                .expect("name not found in registry");
+            logger.pin_log(PIN_STATE, $name);
         });
     }};
     ($name:literal) => {
@@ -92,25 +106,5 @@ macro_rules! no_pins {
     () => {{
         $crate::load_names!(NAMES, NAMES_LENGTH);
         $crate::simple::no_pins(NAMES_LENGTH)
-    }};
-}
-
-/// Log a message to the output pins
-///
-/// Before calling this you need to initialise the logger with [init].
-///
-/// # Example
-// TODO: Would be nice to figure out how to compile this
-/// ```ignore
-/// pin_log!(logger, "Connecting to network");
-/// ```
-///
-#[macro_export]
-macro_rules! pin_log {
-    ($logger:ident, $name:literal) => {{
-        $crate::load_names!(NAMES, NAMES_LENGTH);
-        const PIN_STATE: usize =
-            $crate::internal::pin_state_for_name(NAMES, $name).expect("name not found in registry");
-        $logger.pin_log(PIN_STATE, $name);
     }};
 }
