@@ -118,9 +118,9 @@ macro_rules! load_names {
 #[macro_export]
 macro_rules! pin_log {
     ($logger:ident, $name:literal) => {{
-        pin_logger::load_names!(NAMES, NAMES_LENGTH);
-        const PIN_STATE: usize = pin_logger::internal::pin_state_for_name(NAMES, $name)
-            .expect("name not found in registry");
+        $crate::load_names!(NAMES, NAMES_LENGTH);
+        const PIN_STATE: usize =
+            $crate::internal::pin_state_for_name(NAMES, $name).expect("name not found in registry");
         $logger.pin_log(PIN_STATE, $name);
     }};
 }
@@ -140,34 +140,33 @@ macro_rules! pin_log {
 #[macro_export]
 macro_rules! init {
     ($($output:expr),* $(,)?) => {{
-        pin_logger::load_names!(NAMES, NAMES_LENGTH);
+        $crate::load_names!(NAMES, NAMES_LENGTH);
         // Boxing here so that we don't actually need all the pins to have the same type
-        pin_logger::PinLogger::new(&NAMES, [$($output),*])
+        $crate::PinLogger::new(&NAMES, [$($output),*])
     }};
 }
 
 #[macro_export]
 macro_rules! init2 {
     ($output:expr) => {{
-        pin_logger::load_names!(NAMES, NAMES_LENGTH);
+        $crate::load_names!(NAMES, NAMES_LENGTH);
         // Boxing here so that we don't actually need all the pins to have the same type
-        pin_logger::PinLogger::new(&NAMES, $output)
+        $crate::PinLogger::new(&NAMES, $output)
     }};
 }
 
-// TODO: Reference things relative to this crate in the macro
 #[macro_export]
 macro_rules! no_pins {
     () => {{
-        pin_logger::load_names!(NAMES, NAMES_LENGTH);
-        pin_logger::no_pins(NAMES_LENGTH)
+        $crate::load_names!(NAMES, NAMES_LENGTH);
+        $crate::no_pins(NAMES_LENGTH)
     }};
 }
 
 #[macro_export]
 macro_rules! init_mutex {
     ($mutex:ident, $output:expr) => {
-        critical_section::with(|cs| $mutex.borrow(cs).replace(Some(pin_logger::init2!($output))));
+        critical_section::with(|cs| $mutex.borrow(cs).replace(Some($crate::init2!($output))));
     };
 }
 
@@ -177,7 +176,7 @@ macro_rules! pin_log_mutex {
         critical_section::with(|cs| {
             let mut borrow = $mutex.borrow(cs).borrow_mut();
             let l = borrow.as_mut().unwrap();
-            pin_log!(l, $name);
+            $crate::pin_log!(l, $name);
         });
     }};
 }
