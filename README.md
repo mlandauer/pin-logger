@@ -3,7 +3,7 @@
 [<img alt="crates.io" src="https://img.shields.io/crates/v/pin-logger.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/pin-logger)
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-pin%20logger-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/pin-logger)
 
-A rust no-std embedded-hal compatible library for embedded logging, but with digital output pins to mark bits of code so you can see what's happening while your device is running but without needing a normal console for log output.
+A rust no-std no-alloc embedded-hal compatible library for embedded logging, but with digital output pins to mark bits of code so you can see what's happening while your device is running but without needing a normal console for log output.
 
 ## Why would anyone need this?
 
@@ -42,16 +42,16 @@ It will also show these in the console output as the device is running.
 
 Then, when you use your power profiler you can see when the pins change and see which section is worthy of attention. To figure out what it corresponds you read of the pin values and you can read off the corresponding message and which line of code it came from.
 
-## Usage
+## Setup
 
 In `Cargo.toml`
 
 ```toml
 [dependencies]
-pin_logger = "0.1"
+pin_logger = "0.2"
 
 [build-dependencies]
-pin_logger = "0.1"
+pin_logger = { version = "0.2", features = ["build"] }
 ```
 
 In `build.rs` (create in the root of your project if you don't already have one)
@@ -63,24 +63,15 @@ fn main() {
 }
 ```
 
-Minimal example for esp:
-```ignore
-esp_println::logger::init_logger_from_env();
+Create the static for holding the logger so it's easily accessible everywhere
+```rust
+pin_logger::global_static!(Output);
+```
 
-let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
-let p = esp_hal::init(config);
-
+After you've initialised your embedded hardware but before you do any logging you setup the pins that will be used. On ESP this might look like:
+```rust
 pin_logger::init!(
     Output::new(p.GPIO25, Level::Low, Default::default()),
     Output::new(p.GPIO32, Level::Low, Default::default()),
 );
-pin_log!("Start of main");
-
-loop {
-    pin_log!("Start of loop");
-    info!("Hello world!");
-    let delay_start = Instant::now();
-    while delay_start.elapsed() < Duration::from_millis(500) {}
-    pin_log!("End of loop");
-}
 ```

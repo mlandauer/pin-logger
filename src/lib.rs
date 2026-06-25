@@ -2,6 +2,7 @@
 #![feature(const_trait_impl)]
 #![feature(const_cmp)]
 #![no_std]
+// #![deny(missing_docs)]
 #[cfg(feature = "build")]
 extern crate std;
 
