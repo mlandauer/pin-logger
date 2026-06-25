@@ -9,8 +9,6 @@ extern crate std;
 #[cfg(feature = "build")]
 pub mod build;
 
-pub mod simple;
-
 #[doc(hidden)]
 pub mod internal;
 
@@ -21,7 +19,7 @@ macro_rules! global_static {
             $pin_type,
             {
                 $crate::load_names!(NAMES, NAMES_LENGTH);
-                $crate::simple::no_pins(NAMES_LENGTH)
+                $crate::internal::no_pins(NAMES_LENGTH)
             },
         > = $crate::internal::init_static();
     };
@@ -47,7 +45,7 @@ macro_rules! init {
     ($mutex:ident, $output:expr) => {
         critical_section::with(|cs| {
             $crate::load_names!(NAMES, NAMES_LENGTH);
-            let logger = $crate::simple::PinLogger::new(&NAMES, $output);
+            let logger = $crate::internal::PinLogger::new(&NAMES, $output);
             $mutex.borrow(cs).replace(Some(logger));
         });
     };
