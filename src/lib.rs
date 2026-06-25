@@ -28,7 +28,13 @@ pub mod internal;
 #[macro_export]
 macro_rules! global_static {
     ($mutex:ident, $pin_type:ty) => {
-        static $mutex: $crate::Static<$pin_type, { $crate::no_pins!() }> = $crate::init_static();
+        static $mutex: $crate::Static<
+            $pin_type,
+            {
+                $crate::load_names!(NAMES, NAMES_LENGTH);
+                $crate::simple::no_pins(NAMES_LENGTH)
+            },
+        > = $crate::init_static();
     };
     ($pin_type:ty) => {
         $crate::global_static!(PIN_LOGGER, $pin_type);
@@ -99,12 +105,4 @@ macro_rules! load_names {
         assert!($length > 0);
         const $name: [&str; $length] = include!(concat!(env!("OUT_DIR"), "/names.rs"));
     };
-}
-
-#[macro_export]
-macro_rules! no_pins {
-    () => {{
-        $crate::load_names!(NAMES, NAMES_LENGTH);
-        $crate::simple::no_pins(NAMES_LENGTH)
-    }};
 }
