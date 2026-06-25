@@ -17,3 +17,29 @@ jobs:
       - run: cargo build --verbose
       - run: cargo test --verbose
       - run: cargo clippy --verbose
+
+  fake_hardware:
+    name: fake-hardware example
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/fake-hardware
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update nightly
+      - run: cargo build --verbose
+
+  esp_examples:
+    name: ESP32 examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: esp-rs/xtensa-toolchain@v1
+        with:
+          default: true
+          buildtargets: esp32
+          ldproxy: false
+      - run: cargo build --verbose
+        working-directory: examples/esp-hardware
+      - run: cargo build --verbose
+        working-directory: examples/esp-embassy
