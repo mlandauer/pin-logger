@@ -13,6 +13,7 @@ use log::info;
 #[cfg(feature = "build")]
 pub mod build;
 
+// TODO: Move this inside macro?
 pub type Static<T, const N: usize> = Mutex<RefCell<Option<PinLogger<T, N>>>>;
 
 pub const fn init_static<P: OutputPin, const N: usize>() -> Mutex<RefCell<Option<PinLogger<P, N>>>>
@@ -127,25 +128,16 @@ macro_rules! pin_log {
 
 /// Initialise the logger
 ///
-/// Pass a list of hardware output pins. The pins should implement the [`OutputPin`] trait from embedded-hal.
+/// Pass an array of hardware output pins. The pins should implement the [`OutputPin`] trait from embedded-hal.
 /// The number of pins needed depends on the number of times [`pin_log`] is used.
 ///
 // # Example (using esp-hal)
 // ```
-// let mut logger = pin_logger::init!(
+// let mut logger = pin_logger::init2!([
 //    Output::new(p.GPIO25, Level::Low, Default::default()),
 //    Output::new(p.GPIO32, Level::Low, Default::default()),
-// );
+// ]);
 // ```
-#[macro_export]
-macro_rules! init {
-    ($($output:expr),* $(,)?) => {{
-        $crate::load_names!(NAMES, NAMES_LENGTH);
-        // Boxing here so that we don't actually need all the pins to have the same type
-        $crate::PinLogger::new(&NAMES, [$($output),*])
-    }};
-}
-
 #[macro_export]
 macro_rules! init2 {
     ($output:expr) => {{
