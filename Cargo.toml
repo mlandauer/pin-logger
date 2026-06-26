@@ -14,6 +14,7 @@ repository = "https://github.com/mlandauer/pin-logger"
 build = ["dep:cargo_metadata", "dep:proc-macro2", "dep:syn", "dep:walkdir"]
 
 [dependencies]
+arrayvec = { version = "0.7", default-features = false }
 critical-section = "1.2.0"
 embedded-hal = "1.0.0"
 log = "0.4.32"

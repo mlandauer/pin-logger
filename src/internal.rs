@@ -1,3 +1,4 @@
+use arrayvec::ArrayVec;
 use core::{cell::RefCell, str::from_utf8};
 use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
@@ -41,15 +42,29 @@ impl<P, const N: usize> PinLogger<P, N>
 where
     P: OutputPin,
 {
-    // TODO: It would be nice if we could pass more pins and if there are too many the end ones are discarded
-    pub fn new(outputs: [P; N]) -> Self {
-        let mut logger = Self {
+    pub fn new<const M: usize>(mut outputs: [P; M]) -> Self {
+        // TODO: In case of failure say what the minimum number of pins is
+        const { assert!(M >= N, "Too few pins provided to init") }
+
+        // We want to zero ALL the passed pins even if they're not necessary later on
+        // It would be confusing otherwise
+        for output in &mut outputs {
+            output.set_low().unwrap();
+        }
+
+        // Shorten the array
+        let shortened = outputs
+            .into_iter()
+            .take(N)
+            .collect::<ArrayVec<P, N>>()
+            .into_inner()
+            // We know because of the const assert above that this shouldn't fail
+            .unwrap_or_else(|_| unreachable!());
+
+        Self {
             pin_state: 0,
-            outputs,
-        };
-        // Zeros the output pins
-        logger.update_state(0);
-        logger
+            outputs: shortened,
+        }
     }
 
     pub fn pin_log(&mut self, pin_state: usize, name: &str) {

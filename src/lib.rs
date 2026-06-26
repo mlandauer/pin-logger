@@ -52,7 +52,10 @@ macro_rules! global_static {
 /// Initialise the logger
 ///
 /// Pass an array of hardware output pins. The pins should implement the [`OutputPin`](embedded_hal::digital::OutputPin) trait from [`embedded-hal`](embedded_hal).
-/// The number of pins needed depends on the number of times [`pin_log`] is used.
+///
+/// The number of pins needed depends on the number of times [`pin_log`] is used. For instance, if there
+/// are 7 [`pin_log`] calls, We need 3 bits to represent 8 values so at a minimum you'll need to pass 3 output pins.
+/// If you want you can pass more. Any extra will just be ignored (but set low at the start).
 ///
 /// Note that the type needs to match that passed to [`global_static`].
 ///

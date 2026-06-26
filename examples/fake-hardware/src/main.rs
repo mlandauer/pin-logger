@@ -11,7 +11,8 @@ pin_logger::global_static!(FakePin);
 fn main() {
     colog::init();
 
-    pin_logger::init!([FakePin::new(0), FakePin::new(1)]);
+    // We only need two output pins but we can pass more if we want
+    pin_logger::init!([FakePin::new(0), FakePin::new(1), FakePin::new(2)]);
     pin_log!("Start");
     // Do something here
     pin_log!("Middle");
