@@ -1,4 +1,4 @@
-use embedded_hal::digital::OutputPin;
+use core::convert::Infallible;
 use log::info;
 
 /// Can be used for naive testing and examples. Implements the
@@ -15,27 +15,17 @@ impl TestPin {
     }
 }
 
-/// For errors in TestPin
-#[derive(Debug)]
-pub struct Error;
-
-impl embedded_hal::digital::Error for Error {
-    fn kind(&self) -> embedded_hal::digital::ErrorKind {
-        embedded_hal::digital::ErrorKind::Other
-    }
-}
-
 impl embedded_hal::digital::ErrorType for TestPin {
-    type Error = Error;
+    type Error = Infallible;
 }
 
-impl OutputPin for TestPin {
-    fn set_low(&mut self) -> Result<(), Error> {
+impl embedded_hal::digital::OutputPin for TestPin {
+    fn set_low(&mut self) -> Result<(), Infallible> {
         info!("==> Setting test pin {} low", self.number);
         Ok(())
     }
 
-    fn set_high(&mut self) -> Result<(), Error> {
+    fn set_high(&mut self) -> Result<(), Infallible> {
         info!("==> Setting test pin {} high", self.number);
         Ok(())
     }
