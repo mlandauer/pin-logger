@@ -1,18 +1,23 @@
 use embedded_hal::digital::OutputPin;
 use log::info;
 
-pub(crate) struct TestPin {
-    pub(crate) number: u8,
+/// Can be used for naive testing and examples. Implements the
+/// [`embedded_hal::digital::OutputPin`] trait and just logs any state
+/// changes
+pub struct TestPin {
+    number: u8,
 }
 
 impl TestPin {
-    pub(crate) fn new(number: u8) -> Self {
+    /// Create a new test pin with a given number which is just used in logging
+    pub fn new(number: u8) -> Self {
         Self { number }
     }
 }
 
+/// For errors in TestPin
 #[derive(Debug)]
-pub(crate) struct Error;
+pub struct Error;
 
 impl embedded_hal::digital::Error for Error {
     fn kind(&self) -> embedded_hal::digital::ErrorKind {

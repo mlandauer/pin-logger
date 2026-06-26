@@ -1,10 +1,8 @@
 // Simple example that doesn't depend on any particular embedded hardware that shows
 // how you can use this library
 
-use crate::test_pin::TestPin;
 use pin_logger::pin_log;
-
-mod test_pin;
+use pin_logger::test_pin::TestPin;
 
 pin_logger::global_static!(TestPin);
 

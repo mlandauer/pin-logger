@@ -13,6 +13,10 @@ pub mod build;
 #[doc(hidden)]
 pub mod internal;
 
+/// Contains a "fake" implementation of an output pin struct that can be used for
+/// testing and examples
+pub mod test_pin;
+
 /// Creates a static in the current context which holds the logger. It's protected by a [`critical_section::Mutex`] so can be used across threads safely.
 /// By default the static is called `PIN_LOGGER` but this can be changed.
 ///
