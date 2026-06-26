@@ -1,4 +1,4 @@
-use embedded_hal::digital::{Error, ErrorKind, ErrorType, OutputPin};
+use embedded_hal::digital::OutputPin;
 use log::info;
 
 pub(crate) struct TestPin {
@@ -12,27 +12,25 @@ impl TestPin {
 }
 
 #[derive(Debug)]
-pub(crate) struct TestPinError;
+pub(crate) struct Error;
 
-impl Error for TestPinError {
-    fn kind(&self) -> ErrorKind {
-        ErrorKind::Other
+impl embedded_hal::digital::Error for Error {
+    fn kind(&self) -> embedded_hal::digital::ErrorKind {
+        embedded_hal::digital::ErrorKind::Other
     }
 }
 
-impl ErrorType for TestPin {
-    type Error = TestPinError;
+impl embedded_hal::digital::ErrorType for TestPin {
+    type Error = Error;
 }
 
-pub(crate) type TestPinResult = Result<(), TestPinError>;
-
 impl OutputPin for TestPin {
-    fn set_low(&mut self) -> TestPinResult {
+    fn set_low(&mut self) -> Result<(), Error> {
         info!("==> Setting test pin {} low", self.number);
         Ok(())
     }
 
-    fn set_high(&mut self) -> TestPinResult {
+    fn set_high(&mut self) -> Result<(), Error> {
         info!("==> Setting test pin {} high", self.number);
         Ok(())
     }
