@@ -55,14 +55,14 @@ where
     pub fn pin_log(&mut self, pin_state: usize, name: &str) {
         let before = self.binary_string(self.pin_state);
         let before = from_utf8(&before).unwrap();
-        self.pin_state = pin_state;
+        self.update_state(pin_state);
         let after = self.binary_string(self.pin_state);
         let after = from_utf8(&after).unwrap();
-        self.set_outputs(self.pin_state);
         info!("{before}->{after}: {name}");
     }
 
-    fn set_outputs(&mut self, pin_state: usize) {
+    fn update_state(&mut self, pin_state: usize) {
+        self.pin_state = pin_state;
         let mut c = pin_state;
         for output in self.outputs.iter_mut() {
             // TODO: Do we want to panic here or return an error or ignore it?
