@@ -49,10 +49,10 @@ In `Cargo.toml`
 
 ```toml
 [dependencies]
-pin_logger = "0.2"
+pin_logger = "0.4"
 
 [build-dependencies]
-pin_logger = { version = "0.2", features = ["build"] }
+pin_logger = { version = "0.4", features = ["build"] }
 ```
 
 In `build.rs` (create in the root of your project if you don't already have one)
