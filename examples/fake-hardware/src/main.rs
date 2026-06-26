@@ -1,10 +1,10 @@
 // Simple example that doesn't depend on any particular embedded hardware that shows
 // how you can use this library
 
-use crate::fake_pin::FakePin;
+use crate::test_pin::FakePin;
 use pin_logger::pin_log;
 
-mod fake_pin;
+mod test_pin;
 
 pin_logger::global_static!(FakePin);
 
